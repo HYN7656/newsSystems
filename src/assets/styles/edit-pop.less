@@ -1,0 +1,96 @@
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+.tip-dialog {
+  .el-dialog {
+    max-width: 1000px;
+    width: 100%;
+    .dialog-footer {
+      text-align: center;
+      .el-button:nth-of-type(2) {
+        margin-left: 80px;
+      }
+      .el-button--primary {
+        background: #026ab3;
+        border-color: #026ab3;
+      }
+    }
+    .el-dialog__header {
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+      padding: 10px 20px 10px;
+      .el-dialog__headerbtn {
+        top: 15px;
+        right: 15px;
+      }
+      .el-dialog__title {
+        line-height: 20px;
+        font-size: 15px;
+      }
+    }
+    .el-dialog__footer {
+      padding: 35px 20px 20px;
+    }
+    .el-dialog__body {
+      .el-input__inner {
+        padding-left: 10px;
+        height: 35px;
+        line-height: 35px;
+        font-size: 13px;
+      }
+      .content {
+        width:100%;
+        padding:10px 30px;
+        box-sizing: border-box;
+        .cell {
+          display: flex;
+          //margin-bottom: 15px;
+          width:100%;
+          .name {
+            display: block;
+            width: 80px;
+            line-height: 35px;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+          }
+          .flew-input {
+            flex: 1;
+          }
+          .btn {
+            display: block;
+            width:120px;
+            height:40px;
+            line-height: 40px;
+            text-align: center;
+            font-size: 18px;
+            color:#fff;
+            margin-left: 30px;
+            background: #026ab3;
+          }
+        }
+      }
+    }
+  }
+}
