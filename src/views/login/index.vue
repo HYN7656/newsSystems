@@ -49,6 +49,7 @@
 </template>
 
 <script>
+  import Utils from '@/utils/utils2.js'
   export default {
     data() {
       return {
@@ -75,7 +76,7 @@
           // this.$router.push({name: 'home'})
           let params = {};
           params['uName'] = this.userNum;
-          params['uPasswd'] = this.userPassword;
+          params['uPasswd'] = Utils.encrypt(this.userPassword);
           console.log(params)
           API.post('/ususer/login', params).then((res) => {
             console.log(res.data)
