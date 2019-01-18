@@ -59,7 +59,7 @@ class API {
 
     }
     config.url=uri;
-    console.log(config)
+    // console.log(config)
     return axios.get(uri,config);
   }
 
@@ -71,6 +71,7 @@ class API {
 
 
   static post(uri,params,headers){
+    config.params = {};
     var data=qs.stringify(params);
     // console.log(data)
     if (!headers) {
@@ -84,6 +85,7 @@ class API {
   }
 
   static put(uri,params,headers){
+    config.params = {};
     var data=qs.stringify(params);
     if (!headers) {
       config.headers['Content-Type'] =  'application/x-www-form-urlencoded;charset=utf-8';

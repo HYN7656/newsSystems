@@ -5,6 +5,16 @@
         <el-input v-model="SearchInp" placeholder="请输入关键词汇" class="input-search"></el-input>
         <i class="el-icon-search icon"></i>
       </div>
+      <div class="select-table">
+        <el-select v-model="SearchValue" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.id"
+            :label="item.iName"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
       <div class="btn-cell" @click="search">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
@@ -29,12 +39,12 @@
           class="column">
         </el-table-column>
         <el-table-column
-          prop="fTitle"
+          prop="title"
           label="标题"
           :show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column
-          prop="fCreateTime"
+          prop="createTime"
           label="创建时间"
           width="120">
         </el-table-column>
@@ -44,7 +54,7 @@
           width="100">
         </el-table-column>
         <el-table-column
-          prop="fReleaseTime"
+          prop="releaseTime"
           label="发布时间"
           width="120">
         </el-table-column>
@@ -53,8 +63,8 @@
           label="置顶"
           width="120">
           <template slot-scope="scope">
-            <el-button type="text" size="small" class="look" @click="toggleTop(scope.row.id,scope.row.fTop)">
-              {{scope.row.fTop == 1 ? "取消置顶" : "置顶"}}
+            <el-button type="text" size="small" class="look" @click="toggleTop(scope.row.id,scope.row.top)">
+              {{scope.row.top == 1 ? "取消置顶" : "置顶"}}
             </el-button>
           </template>
         </el-table-column>
@@ -62,11 +72,11 @@
           label="操作"
           width="250">
           <template slot-scope="scope">
-            <el-button type="text" size="small" class="release" @click="Release(scope.row.id,scope.row.fStatus)"
-                       v-show="!scope.row.fbStatus">发布
+            <el-button type="text" size="small" class="release" @click="Release(scope.row.id,scope.row.fbStatus)"
+                       v-show="!scope.row.status">发布
             </el-button>
-            <el-button type="text" size="small" class="release" @click="ReleaseNo(scope.row.id,scope.row.fStatus)"
-                       v-show="scope.row.fbStatus">取消发布
+            <el-button type="text" size="small" class="release" @click="ReleaseNo(scope.row.id,scope.row.fbStatus)"
+                       v-show="scope.row.status">取消发布
             </el-button>
             <el-button type="text" size="small" class="look" @click="linkDetail(scope.row.id)">查看</el-button>
             <el-button type="text" size="small" class="edit" @click="editOpen(scope.row.id)">编辑</el-button>
@@ -87,75 +97,76 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加新闻" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
-        <div class="cell">
-          <el-form-item label="标题：" prop="fTitle">
-          <!--<span class="name">标题：</span>-->
-            <el-input v-model="addObject.fTitle" placeholder="请输入内容" class="flew-input"></el-input>
-          </el-form-item>
-        </div>
         <el-row>
           <el-col :span="11">
             <div class="cell">
-              <el-form-item label="作者：" prop="fAuthor">
-              <!--<span class="name">作者：</span>-->
-                <el-input v-model="addObject.fAuthor" placeholder="请输入内容" class="flew-input"></el-input>
+              <el-form-item label="标题：" prop="title">
+                <!--<span class="name">标题：</span>-->
+                <el-input v-model="addObject.title" placeholder="请输入内容" class="flew-input"></el-input>
               </el-form-item>
             </div>
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
               <span class="name">来源：</span>
-              <el-input v-model="addObject.fFrom" placeholder="请输入内容" class="flew-input"></el-input>
+              <el-input v-model="addObject.dFrom" placeholder="请输入内容" class="flew-input"></el-input>
             </div>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="11">
-            <div class="cell">
-              <span class="name">缩略图：</span>
-              <el-upload
-                class="avatar-uploader"
-                :action="uploadUrlImg()"
-                :show-file-list="false"
-                :on-success="succImgAdd"
-                :headers="myHeaders">
-                <img v-if="addObject.fImgUrl" :src="addObject.fImgUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </div>
+          <el-col :span="11"><div class="cell">
+            <el-form-item label="作者：" prop="author">
+              <!--<span class="name">作者：</span>-->
+              <el-input v-model="addObject.author" placeholder="请输入内容" class="flew-input"></el-input>
+            </el-form-item>
+          </div>
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
-              <span class="name">上传附件：</span>
-              <el-upload
-                ref="Addupload"
-                class="upload-demo"
-                :action="uploadUrl()"
-                :file-list="AddfileList"
-                :auto-upload="true"
-                :multiple="true"
-                :limit="5"
-                :on-exceed="handleExceed"
-                :on-success="succAdd"
-                :on-remove="remAdd"
-                :headers="myHeaders">
-                <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
-                <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-              </el-upload>
+              <el-form-item label="分类：" prop="iId">
+                <!--<span class="name">分类：</span>-->
+                <el-select v-model="addObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 332.48px">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.id"
+                    :label="item.iName"
+                    :value="item.id"></el-option>
+                </el-select>
+              </el-form-item>
             </div>
-          </el-col>
+            </el-col>
+        </el-row>
+        <el-row>
+          <div class="cell">
+            <span class="name">上传附件：</span>
+            <el-upload
+              ref="Addupload"
+              class="upload-demo"
+              :action="uploadUrl()"
+              :file-list="AddfileList"
+              :auto-upload="true"
+              :multiple="true"
+              :limit="5"
+              :on-exceed="handleExceed"
+              :on-success="succAdd"
+              :on-remove="remAdd"
+              :headers="myHeaders">
+              <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
+              <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+            </el-upload>
+          </div>
         </el-row>
         <div class="cell" style="margin-top: 20px;">
           <span class="name">内容：</span>
-          <quill-editor ref="myTextEditor"
-                        v-model="addObject.fContent"
-                        :options="editorOption"
-                        @change="onAddChange($event)">
-          </quill-editor>
-        </div>
+            <quill-editor ref="myTextEditor"
+                          v-model="addObject.content"
+                          :options="editorOption"
+                          @change="onAddChange($event)">
+            </quill-editor>
+          </div>
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -164,78 +175,80 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
-        <div class="cell">
-          <el-form-item label="标题：" prop="fTitle">
-          <!--<span class="name">标题：</span>-->
-            <el-input v-model="editObject.fTitle" placeholder="请输入内容" class="flew-input"></el-input>
-          </el-form-item>
-        </div>
         <el-row>
           <el-col :span="11">
             <div class="cell">
-              <el-form-item label="作者：" prop="fAuthor">
-              <!--<span class="name">作者：</span>-->
-                <el-input v-model="editObject.fAuthor" placeholder="请输入内容" class="flew-input"></el-input>
+              <el-form-item label="标题：" prop="title">
+                <!--<span class="name">标题：</span>-->
+                <el-input v-model="editObject.title" placeholder="请输入内容" class="flew-input"></el-input>
               </el-form-item>
             </div>
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
               <span class="name">来源：</span>
-              <el-input v-model="editObject.fFrom" placeholder="请输入内容" class="flew-input"></el-input>
+              <el-input v-model="editObject.dFrom" placeholder="请输入内容" class="flew-input"></el-input>
             </div>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="11">
             <div class="cell">
-              <span class="name">缩略图：</span>
-              <el-upload
-                class="avatar-uploader"
-                :action="uploadUrlImg()"
-                :show-file-list="false"
-                :on-success="succImgEdit"
-                :headers="myHeaders">
-                <img v-if="editObject.fImgUrl" :src="editObject.fImgUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
+              <el-form-item label="作者：" prop="author">
+                <!--<span class="name">作者：</span>-->
+                <el-input v-model="editObject.author" placeholder="请输入内容" class="flew-input"></el-input>
+              </el-form-item>
             </div>
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
-              <span class="name">上传附件：</span>
-              <el-upload
-                ref="Editupload"
-                class="upload-demo"
-                :action="uploadUrl()"
-                :file-list="EditfileList"
-                :multiple="true"
-                :limit="5"
-                :on-exceed="handleExceed"
-                :on-success="succEdit"
-                :on-remove="remEdit"
-                :headers="myHeaders">
-                <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
-                <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-              </el-upload>
+              <el-form-item label="分类：" prop="iId">
+                <!--<span class="name">分类：</span>-->
+                <el-select v-model="editObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 332.48px">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.id"
+                    :label="item.iName"
+                    :value="item.id"></el-option>
+                </el-select>
+              </el-form-item>
             </div>
           </el-col>
         </el-row>
+        <el-row>
+          <div class="cell">
+            <span class="name">上传附件：</span>
+            <el-upload
+              ref="Editupload"
+              class="upload-demo"
+              :action="uploadUrl()"
+              :file-list="EditfileList"
+              :multiple="true"
+              :limit="5"
+              :on-exceed="handleExceed"
+              :on-success="succEdit"
+              :on-remove="remEdit"
+              :headers="myHeaders">
+              <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
+              <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+            </el-upload>
+          </div>
+        </el-row>
         <div class="cell" style="margin-top: 20px;">
           <span class="name">内容：</span>
-            <quill-editor ref="myTextEditor"
-                          v-model="editObject.fContent"
-                          :options="editorOption"
-                          @change="onEditorChange($event)">
-            </quill-editor>
+          <quill-editor ref="myTextEditor"
+                        v-model="editObject.content"
+                        :options="editorOption"
+                        @change="onEditorChange($event)">
+          </quill-editor>
         </div>
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" >确 定</el-button>
+        <el-button type="primary" @click="editSave('editObject')" class="confirmTip">确 定</el-button>
         <el-button @click="editPop = false" class="cancelTip">取 消</el-button>
       </div>
     </el-dialog>
@@ -257,7 +270,6 @@
     components: {quillEditor},
     data() {
       return {
-        // loadingBtn:false,
         loading: false,
         editPop: false,
         addPop: false,
@@ -265,44 +277,46 @@
         // fSystemId: 1,
         // 搜索初始化
         SearchInp: '',
+        SearchValue : '',
         // 删除选择初始化
         multipleSelection: [],
         activeTableDataId: [],
         activeTableDataId2: '',
         // 校验
         rules: {
-          fTitle: [
+          title: [
             { required: true, message: '必填', trigger: 'blur' },
             { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ],
-          fAuthor: [
+          author: [
             { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 20 个字符', trigger: 'blur' }
+            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
           ],
-
+          iId: [
+            { required: true, message: '必填', trigger: 'change' },
+          ],
         },
+        options : [],
         addObject: {
-          fTitle: '',
-          fContent: '',
-          fContents: '',
-          furl: '',
-          fImgUrl: '',
-          fAuthor: '',
-          fFrom: '',
-          fEnclUrl: '',
-          fEnclName: ''
+          title: '',
+          content: '',
+          contents: '',
+          author: '',
+          dFrom: '',
+          enclUrl: '',
+          enclName: '',
+          iId : ''
         },
         myHeaders :{Authorization:storage.get('token')},
         editObject: {
-          fTitle: '',
-          fContent: '',
-          fContents: '',
-          furl: '',
-          fImgUrl: '',
-          fAuthor: '',
-          fFrom: '',
-          fEnclUrl: '',
-          fEnclName: ''
+          title: '',
+          content: '',
+          contents: '',
+          enclName : '',
+          author: '',
+          dFrom: '',
+          enclUrl: '',
+          iId : ''
         },
         AddfileList: [],
         EditfileList: [],
@@ -336,17 +350,19 @@
           },
           theme:'snow'
         },
-        tableData: []
+        tableData: [],
+        top : 0
       }
     },
     computed: {},
     methods: {
+
       // 页面初始化
       getPage() {
         let params = {};
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
-        API.get('/newsInfo/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/design/findAll', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
             console.log(res.data)
             this.tableData = res.data.data;
@@ -367,14 +383,29 @@
           }
         })
       },
+      classify() {
+        let params = {};
+        params['type'] = 4;
+        API.get('/ification/findByType', params,{Authorization:storage.get('token')}).then((res) => {
+          console.log(res.data)
+          if(res.data.code == 200){
+            this.options = res.data.data;
+          }else if(res.data.code == 1001){
+            this.signOut()
+          }
+          console.log(this.options)
+        })
+      },
       // 搜索
       search() {
         console.log(this.SearchInp)
         let params = {};
         params['title'] = this.SearchInp;
+        params['iId'] = this.SearchValue;
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
-        API.get('/newsInfo/FindBytitle', params,{Authorization:storage.get('token')}).then((res) => {
+        console.log(params)
+        API.get('/design/findAll', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.tableData = res.data.data;
@@ -391,15 +422,14 @@
         this.addPop = true;
         this.AddfileList = [];
         this.addObject = {
-          fTitle: '',
-          fContent: '',
-          fContents: '',
-          furl: '',
-          fImgUrl: '',
-          fEnclName : '',
-          fAuthor: '',
-          fFrom: '',
-          fEnclUrl: ''
+          title: '',
+          content: '',
+          contents: '',
+          enclName : '',
+          author: '',
+          dFrom: '',
+          enclUrl: '',
+          iId : ''
         }
         if(this.$refs.addObject){
           this.$refs.addObject.clearValidate();
@@ -414,26 +444,27 @@
             // 上传数据
             var arr = [];
             var arr2 = [];
+            console.log(this.AddfileList)
             for (var i = 0; i < this.AddfileList.length; i++) {
               if (this.AddfileList[i].response.code == '200') {
                 arr.push(this.AddfileList[i].response.data.revealImage);
                 arr2.push(this.AddfileList[i].response.data.imageName);
               }
             }
-            this.addObject.fEnclUrl = arr.join(',');
-            this.addObject.fEnclName = arr2.join(',');
+            this.addObject.enclUrl = arr.join(',');
+            this.addObject.enclName = arr2.join(',');
             let params = {};
-            params['fTitle'] = this.addObject.fTitle;
-            params['fContent'] = this.addObject.fContent;
-            params['fContents'] = this.addObject.fContents.replace(/[\r\n]/g, "");
-            params['fImgUrl'] = this.addObject.furl;
-            params['fEnclUrl'] = this.addObject.fEnclUrl;
-            params['fEnclName'] = this.addObject.fEnclName;
-            params['fAuthor'] = this.addObject.fAuthor;
-            params['fFrom'] = this.addObject.fFrom;
-            params['fSystemId'] = storage.get('sysid');
+            params['title'] = this.addObject.title;
+            params['content'] = this.addObject.content;
+            params['contents'] = this.addObject.contents.replace(/[\r\n]/g, "");
+            params['iId'] = this.addObject.iId;
+            params['enclUrl'] = this.addObject.enclUrl;
+            params['enclName'] = this.addObject.enclName;
+            params['author'] = this.addObject.author;
+            params['dFrom'] = this.addObject.dFrom;
+            params['systemId'] = storage.get('sysid');
             console.log(params)
-            API.post('/newsInfo/create', params,{Authorization:storage.get('token')}).then((res) => {
+            API.post('/design/create', params,{Authorization:storage.get('token')}).then((res) => {
               console.log(res.data)
               if (res.data.code == 200) {
                 this.addPop = false;
@@ -454,18 +485,6 @@
           }
         })
       },
-      // 新增图片上传
-      succImgAdd(response, file, fileList) {
-        console.log(response)
-        let fileName = file.name;
-        let regex = /(.jpg|.jpeg|.gif|.png|.bmp)$/;
-        if (regex.test(fileName.toLowerCase())) {
-          this.addObject.furl = response.data.revealImage;
-          this.addObject.fImgUrl = URL.createObjectURL(file.raw);
-        } else {
-          this.$message.error('请选择图片文件');
-        }
-      },
       // 新增上传功能成功
       succAdd(response, file, fileList) {
         this.AddfileList = fileList;
@@ -482,25 +501,21 @@
         this.editPop = true;
         this.EditfileList = [];
         this.editObject = {
-          fTitle: '',
-          fContent: '',
-          fContents: '',
-          furl: '',
-          fImgUrl: '',
-          fEnclName : '',
-          fAuthor: '',
-          fFrom: '',
-          fEnclUrl: ''
+          title: '',
+          content: '',
+          contents: '',
+          enclName : '',
+          author: '',
+          dFrom: '',
+          enclUrl: '',
+          iId : ''
         }
         let params = {};
         params['id'] = id;
-        API.get('/newsInfo/FindById', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/design/findById', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
-            this.editObject.fImgUrl = config.baseURL + res.data.data.data.fImgUrl;
-            console.log(this.editObject.fImgUrl)
-            this.editObject.furl = this.editObject.fImgUrl;
             // 上传列表
             this.EditfileList = res.data.data.file;
             var obj = [];
@@ -531,21 +546,25 @@
                 arr2.push(this.EditfileList[i].name)
               }
             }
-            this.editObject.fEnclUrl = arr.join(',');
-            this.editObject.fEnclName = arr2.join(',');
+            this.editObject.enclUrl = arr.join(',');
+            this.editObject.enclName = arr2.join(',');
             let params = {};
             params['id'] = this.editObject.id;
-            params['fTitle'] = this.editObject.fTitle;
-            params['fContent'] = this.editObject.fContent;
-            params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
-            params['fImgUrl'] = this.editObject.furl;
-            params['fEnclUrl'] = this.editObject.fEnclUrl;
-            params['fEnclName'] = this.editObject.fEnclName;
-            params['fAuthor'] = this.editObject.fAuthor;
-            params['fFrom'] = this.editObject.fFrom;
-            params['fSystemId'] = storage.get('sysid');
+            params['title'] = this.editObject.title;
+            params['content'] = this.editObject.content;
+            if(this.editObject.contents){
+              params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+            }else {
+              params['contents'] = '';
+            }
+            params['iId'] = this.editObject.iId;
+            params['enclUrl'] = this.editObject.enclUrl;
+            params['enclName'] = this.editObject.enclName;
+            params['author'] = this.editObject.author;
+            params['dFrom'] = this.editObject.dFrom;
+            params['systemId'] = storage.get('sysid');
             console.log(params)
-            API.put('/newsInfo/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+            API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
               if (res.data.code == 200) {
                 this.editPop = false;
                 this.getPage();
@@ -565,17 +584,6 @@
           }
         })
       },
-      // 编辑图片上传
-      succImgEdit(response, file, fileList) {
-        let fileName = file.name;
-        let regex = /(.jpg|.jpeg|.gif|.png|.bmp)$/;
-        if (regex.test(fileName.toLowerCase())) {
-          this.editObject.furl = response.data.revealImage;
-          this.editObject.fImgUrl = URL.createObjectURL(file.raw);
-        } else {
-          this.$message.error('请选择图片文件');
-        }
-      },
       // 编辑上传功能成功
       succEdit(response, file, fileList) {
         this.EditfileList = fileList;
@@ -587,10 +595,6 @@
       // 文件上传部分
       handleExceed(files, fileList) {
         this.$message.warning(`当前已有${fileList.length} 个文件，限制选择5个文件，本次选择了 ${files.length} 个文件`);
-      },
-      // 上传图片地址
-      uploadUrlImg(){
-        return config.baseURL + '/newsInfo/newsFile'
       },
       // 上传文件地址
       uploadUrl(){
@@ -605,8 +609,8 @@
         }).then(() => {
           let params = {};
           params['id'] = id;
-          params['fSystemId'] = storage.get('sysid');
-          API.delete('/newsInfo/newsDelete', params,{Authorization:storage.get('token')}).then((res) => {
+          params['systemId'] = storage.get('sysid');
+          API.delete('/design/delete', params,{Authorization:storage.get('token')}).then((res) => {
             if (res.data.code == 200) {
               this.getPage();
               this.$message({
@@ -648,8 +652,8 @@
         }).then(() => {
           let params = {};
           params['id'] = this.activeTableDataId2;
-          params['fSystemId'] = storage.get('sysid');
-          API.delete('/newsInfo/newsDelete', params,{Authorization:storage.get('token')}).then((res) => {
+          params['systemId'] = storage.get('sysid');
+          API.delete('/design/delete', params,{Authorization:storage.get('token')}).then((res) => {
             console.log(res.data)
             if (res.data.code == 200) {
               this.$message({
@@ -670,12 +674,17 @@
       },
       // 置顶
       toggleTop(id, fTop) {
+        if(fTop == 1){
+          this.top = 0;
+        }else if(fTop == 0){
+          this.top = 1;
+        }
         let params = {};
         params['id'] = id;
-        params['fTop'] = fTop;
-        params['fSystemId'] = storage.get('sysid');
+        params['top'] = this.top;
+        params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.post('/newsInfo/newsupdatetop', params,{Authorization:storage.get('token')}).then((res) => {
+        API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()
@@ -693,10 +702,10 @@
       Release(id, fStatus) {
         let params = {};
         params['id'] = id;
-        params['fStatus'] = fStatus;
-        params['fSystemId'] = storage.get('sysid');
+        params['status'] = 1;
+        params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.post('/newsInfo/newsrelease', params,{Authorization:storage.get('token')}).then((res) => {
+        API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()
@@ -714,10 +723,10 @@
       ReleaseNo(id, fStatus) {
         let params = {};
         params['id'] = id;
-        params['fStatus'] = fStatus;
-        params['fSystemId'] = storage.get('sysid');
+        params['status'] = 0;
+        params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.post('/newsInfo/newsrelease', params,{Authorization:storage.get('token')}).then((res) => {
+        API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()
@@ -733,7 +742,7 @@
       },
       // 查看
       linkDetail(id) {
-        this.$router.push({name: 'backstage.news.detail', query: {id: id}})
+        this.$router.push({name: 'backstage.design.detail', query: {id: id}})
       },
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
@@ -749,12 +758,12 @@
       },
       // 编辑器
       onEditorChange({editor, html, text}) {
-        this.editObject.fContent = html
-        this.editObject.fContents = text
+        this.editObject.content = html
+        this.editObject.contents = text
       },
       onAddChange({editor, html, text}) {
-        this.addObject.fContent = html
-        this.addObject.fContents =text
+        this.addObject.content = html
+        this.addObject.contents =text
       },
       signOut(){
         this.$message({
@@ -771,7 +780,7 @@
     },
     created() {
       this.getPage();
-
+      this.classify();
 
     },
     mounted() {
@@ -787,6 +796,22 @@
   @import "./../../../../assets/styles/edit-pop.less";
   @import "./../../../../assets/styles/base2";
 
-
+  .search-nav {
+    .input-table {
+      width: 35% !important;
+    }
+    .select-table {
+      float: left;
+      margin-left: 30px;
+      position: relative;
+      width: 15%;
+      .el-input__inner {
+        padding-left: 30px;
+        height: 35px;
+        line-height: 35px;
+        font-size: 13px;
+      }
+    }
+  }
 </style>
 

@@ -208,7 +208,7 @@
               <span class="name">缩略图：</span>
               <el-upload
                 class="avatar-uploader"
-                action="http://192.168.3.41:8083/newsInfo/newsFile"
+                :action="uploadUrlImg()"
                 :show-file-list="false"
                 :on-success="succImgAdd"
                 :headers="myHeaders">
@@ -223,7 +223,7 @@
               <el-upload
                 ref="Addupload"
                 class="upload-demo"
-                action="http://192.168.3.41:8083/newsInfo/newsFiles"
+                :action="uploadUrl()"
                 :file-list="AddfileList"
                 :auto-upload="true"
                 :multiple="true"
@@ -298,7 +298,7 @@
               <span class="name">缩略图：</span>
               <el-upload
                 class="avatar-uploader"
-                action="http://192.168.3.41:8083/newsInfo/newsFile"
+                :action="uploadUrlImg()"
                 :show-file-list="false"
                 :on-success="succImgEdit"
                 :headers="myHeaders">
@@ -313,7 +313,7 @@
               <el-upload
                 ref="Editupload"
                 class="upload-demo"
-                action="http://192.168.3.41:8083/newsInfo/newsFiles"
+                :action="uploadUrl()"
                 :file-list="EditfileList"
                 :multiple="true"
                 :limit="5"
@@ -347,6 +347,7 @@
 </template>
 
 <script>
+  import config from "@/config/config.js";
   import {quillEditor} from 'vue-quill-editor'
   import * as Quill from 'quill' //引入编辑器
   //quill编辑器的字体
@@ -425,12 +426,14 @@
         rules: {
           nTitle: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ],
           iId: [
             { required: true, message: '必填', trigger: 'change' },
           ],
           nAuthor: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
           ],
         },
         AddfileList: [],
@@ -505,7 +508,7 @@
         console.log(this.SearchInp)
         let params = {};
         params['title'] = this.SearchInp;
-        params['iId'] = this.SearchValue;
+        params['Iid'] = this.SearchValue;
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
         console.log(params)
@@ -561,7 +564,12 @@
             let params = {};
             params['nTitle'] = this.addObject.nTitle;
             params['nContent'] = this.addObject.nContent;
-            params['nContents'] = this.addObject.nContents.replace(/[\r\n]/g, "");
+            if(this.addObject.nContents){
+              params['nContents'] = this.addObject.nContents.replace(/[\r\n]/g, "");
+            }else {
+              params['nContents'] = '';
+            }
+
             params['nImgUrl'] = this.addObject.nurl;
             params['nAuthor'] = this.addObject.nAuthor;
             params['nFrom'] = this.addObject.nFrom;
@@ -635,6 +643,7 @@
           console.log(res.data)
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
+            this.editObject.nImgUrl = config.baseURL + res.data.data.data.nImgUrl;
             this.editObject.nurl = this.editObject.nImgUrl;
             // 上传列表
             this.EditfileList = res.data.data.file;
@@ -668,13 +677,17 @@
             }
             this.editObject.nEnclUrl = arr.join(',');
             this.editObject.nEnclName = arr2.join(',');
-
-            console.log(this.editObject.nurl)
+            // console.log(this.editObject.nContents)
+            // console.log(this.editObject.nurl)
             let params = {};
             params['id'] = this.editObject.id;
             params['nTitle'] = this.editObject.nTitle;
             params['nContent'] = this.editObject.nContent;
-            params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+            if(this.editObject.nContents){
+              params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+            }else {
+              params['nContents'] = '';
+            }
             params['nImgUrl'] = this.editObject.nurl;
             params['nAuthor'] = this.editObject.nAuthor;
             params['nFrom'] = this.editObject.nFrom;
@@ -725,6 +738,14 @@
       // 文件上传部分
       handleExceed(files, fileList) {
         this.$message.warning(`当前已有${fileList.length} 个文件，限制选择5个文件，本次选择了 ${files.length} 个文件`);
+      },
+      // 上传图片地址
+      uploadUrlImg(){
+        return config.baseURL + '/newsInfo/newsFile'
+      },
+      // 上传文件地址
+      uploadUrl(){
+        return config.baseURL + '/newsInfo/newsFiles'
       },
       // 单个删除
       del(id) {
@@ -864,7 +885,8 @@
       //分类
       classify() {
         let params = {};
-        API.get('/ification/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
+        params['type'] = 1;
+        API.get('/ification/findByType', params,{Authorization:storage.get('token')}).then((res) => {
           if(res.data.code == 200){
             this.options = res.data.data;
           }else if(res.data.code == 1001){
@@ -1014,7 +1036,6 @@
       line-height: 35px !important;
       font-size: 15px !important;
     }
-
   }
 
   .mb-box {

@@ -32,7 +32,7 @@
       </div>
       <br/><br/>
       <div class="down_res" v-for="i in file">
-        <a :href="i.fenclUrl" style="color: #df6657;text-align: left;" >{{i.fenclName}}</a>
+        <a :href="i.url" style="color: #df6657;text-align: left;" >{{i.fenclName}}</a>
       </div>
       <br/><br/><br/>
     </div>
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+  import config from "@/config/config.js";
   export default {
     data(){
       return{
@@ -59,6 +60,9 @@
           if(res.data.code == 200) {
             this.datail = res.data.data.data;
             this.file = res.data.data.file
+            for(var i=0;i<this.file.length;i++){
+              this.file[i].url = config.baseURL + this.file[i].fenclUrl;
+            }
           }else if(res.data.code == 1001){
             this.signOut()
           }

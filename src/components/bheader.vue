@@ -30,19 +30,43 @@
             </li>
             <li v-show="newsS">
               <router-link :to="{name:'backstage.news'}" class="left-c"
-                           :class="{active: $route.name == 'backstage.news'}"><i class="icon iconfont icon-xinwen"></i>新闻管理
+                           :class="{active: $route.name == 'backstage.news'||$route.name == 'backstage.news.detail'}"><i class="icon iconfont icon-xinwen"></i>新闻管理
               </router-link>
             </li>
             <li v-show="noticeS">
               <router-link :to="{name:'backstage.notice'}" class="left-c"
-                           :class="{active: $route.name == 'backstage.notice'}"><i
+                           :class="{active: $route.name == 'backstage.notice'||$route.name == 'backstage.notice.detail'}"><i
                 class="icon iconfont icon-gonggao"></i>公告管理
               </router-link>
             </li>
             <li v-show="meetingS">
               <router-link :to="{name:'backstage.meeting'}" class="left-c"
-                           :class="{active: $route.name == 'backstage.meeting'}"><i
+                           :class="{active: $route.name == 'backstage.meeting'||$route.name == 'backstage.meeting.detail'}" ><i
                 class="icon iconfont icon-huiyi"></i>会议管理
+              </router-link>
+            </li>
+            <li v-show="planS">
+              <router-link :to="{name:'backstage.plan'}" class="left-c"
+                           :class="{active: $route.name == 'backstage.plan'||$route.name == 'backstage.plan.detail'}"><i
+                class="icon iconfont icon-huiyi"></i>空域规划
+              </router-link>
+            </li>
+            <li v-show="manageS">
+              <router-link :to="{name:'backstage.manage'}" class="left-c"
+                           :class="{active: $route.name == 'backstage.manage'||$route.name == 'backstage.manage.detail'}"><i
+                class="icon iconfont icon-huiyi"></i>空域管理
+              </router-link>
+            </li>
+            <li v-show="designS">
+              <router-link :to="{name:'backstage.design'}" class="left-c"
+                           :class="{active: $route.name == 'backstage.design'||$route.name == 'backstage.design.detail'}"><i
+                class="icon iconfont icon-huiyi"></i>程序设计
+              </router-link>
+            </li>
+            <li v-show="energyS">
+              <router-link :to="{name:'backstage.energy'}" class="left-c"
+                           :class="{active: $route.name == 'backstage.energy'||$route.name == 'backstage.energy.detail'}"><i
+                class="icon iconfont icon-huiyi"></i>节能减排
               </router-link>
             </li>
             <li v-show="userS">
@@ -121,6 +145,10 @@
         meetingS: false,
         userS: false,
         classifyS: false,
+        planS:false,
+        manageS:false,
+        designS:false,
+        energyS:false,
         isActive: 1,
         isLeftActive: 1,
         isLeftNav: 1,
@@ -166,6 +194,14 @@
             this.userS = true
           } else if (this.auth[i] == 5) {
             this.classifyS = true
+          }else if (this.auth[i] == 6) {
+            this.planS = true
+          }else if (this.auth[i] == 7) {
+            this.manageS = true
+          }else if (this.auth[i] == 8) {
+            this.designS = true
+          }else if (this.auth[i] == 9) {
+            this.energyS = true
           }
         }
       },

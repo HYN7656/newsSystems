@@ -77,7 +77,7 @@
           <div class="title ">会议日程</div>
           <div class="ql-editor" v-html="datail.mContent" style="color: #666"></div>
           <div v-for="i in file" class="uploadBox">
-            <a :href="i.fenclUrl" class="upload">{{i.fenclName}}</a>
+            <a :href="i.url" class="upload">{{i.fenclName}}</a>
           </div>
 
         </div>
@@ -94,6 +94,7 @@
 </template>
 
 <script>
+  import config from "@/config/config.js";
     export default {
       data(){
         return{
@@ -127,6 +128,9 @@
             if(res.data.code == 200) {
               this.datail = res.data.data.data;
               this.file = res.data.data.file;
+              for(var i=0;i<this.file.length;i++){
+                this.file[i].url = config.baseURL + this.file[i].fenclUrl;
+              }
               this.partakeHost = res.data.data.data.mHostUnit.split(',');
               this.partakeCompany = res.data.data.data.mParticipatingUnits.split(',');
             }else if(res.data.code == 1001){

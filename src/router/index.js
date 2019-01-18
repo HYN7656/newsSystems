@@ -11,6 +11,20 @@ import BackstageNotice from '@/views/backstage/children/notice/list'
 import BackstageNoticeDetail from '@/views/backstage/children/notice/details'
 import BackstageMeeting from '@/views/backstage/children/meeting/list'
 import BackstageMeetingDetail from '@/views/backstage/children/meeting/details'
+
+// 空域规划
+import BackstagePlan from '@/views/backstage/children/plan/list'
+import BackstagePlanDetail from '@/views/backstage/children/plan/details'
+// 空域管理
+import BackstageManage from '@/views/backstage/children/manage/list'
+import BackstageManageDetail from '@/views/backstage/children/manage/details'
+// 程序设计
+import BackstageDesign from '@/views/backstage/children/design/list'
+import BackstageDesignDetail from '@/views/backstage/children/design/details'
+// 节能减排
+import BackstageEnergy from '@/views/backstage/children/energy/list'
+import BackstageEnergyDetail from '@/views/backstage/children/energy/details'
+
 import BackstageUser from '@/views/backstage/children/user/list'
 import BackstageClassify from '@/views/backstage/children/classify/list'
 Vue.use(Router)
@@ -91,6 +105,70 @@ export default new Router({
           path: 'meeting/detail',
           name: 'backstage.meeting.detail',
           component: BackstageMeetingDetail,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'plan',
+          name: 'backstage.plan',
+          component: BackstagePlan,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'plan/detail',
+          name: 'backstage.plan.detail',
+          component: BackstagePlanDetail,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'manage',
+          name: 'backstage.manage',
+          component: BackstageManage,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'manage/detail',
+          name: 'backstage.manage.detail',
+          component: BackstageManageDetail,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'design',
+          name: 'backstage.design',
+          component: BackstageDesign,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'design/detail',
+          name: 'backstage.design.detail',
+          component: BackstageDesignDetail,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'energy',
+          name: 'backstage.energy',
+          component: BackstageEnergy,
+          meta: {
+            auth: true,
+          }
+        },
+        {
+          path: 'energy/detail',
+          name: 'backstage.energy.detail',
+          component: BackstageEnergyDetail,
           meta: {
             auth: true,
           }

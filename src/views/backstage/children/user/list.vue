@@ -62,7 +62,7 @@
           </el-form-item>
         </div>
         <div class="cell qx">
-          <span class="name" style="padding-left: 15px;">权限：</span>
+          <span class="name" style="padding-left: 15px;"><span style="color: #f56c6c">*</span>权限：</span>
           <div class="qx-div">
             <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="AddAllhandleChecked">全选
             </el-checkbox>
@@ -155,6 +155,7 @@
         rules: {
           uName: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ]
         },
       }
@@ -218,29 +219,36 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            let params = {};
-            params['uName'] = this.addObject.uName;
-            params['qId'] = this.addObject.powerList;
-            params['uSystemId'] = this.uSystemId;
-            console.log(params)
-            API.post('/ususer/create', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'
-                });
-              }
-            })
+            if(!this.addObject.powerList.length){
+              this.$message({
+                type: 'error',
+                message: '请选择权限!'
+              });
+            }else {
+              let params = {};
+              params['uName'] = this.addObject.uName;
+              params['qId'] = this.addObject.powerList;
+              params['uSystemId'] = this.uSystemId;
+              console.log(params)
+              API.post('/ususer/create', params,{Authorization:storage.get('token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '新增失败!'+res.data.message
+                  });
+                }
+              })
+            }
           }
         })
       },
@@ -317,41 +325,39 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            console.log(this.editObject.powerList)
-            console.log(this.editObject)
-            var params = {
-              qId: []
-            };
-            params['id'] = this.editObject.id;
-            params['uName'] = this.editObject.uName;
-            console.log(this.editObject.powerList)
-            console.log(params.qId)
-            /*for(var i=0;i<this.editObject.powerList.length;i++){
-          params.qId[i] = this.editObject.powerList[i]
-        }*/
-            params['qId'] = this.editObject.powerList.join(',');
-            params['uSystemId'] = this.uSystemId;
-
-
-            console.log(params)
-            API.put('/ususer/update', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'
-                });
-              }
-            })
+            if(!this.editObject.powerList.length){
+              this.$message({
+                type: 'error',
+                message: '请选择权限!'
+              });
+            }else{
+              var params = {
+                qId: []
+              };
+              params['id'] = this.editObject.id;
+              params['uName'] = this.editObject.uName;
+              params['qId'] = this.editObject.powerList.join(',');
+              params['uSystemId'] = this.uSystemId;
+              console.log(params)
+              API.put('/ususer/update', params,{Authorization:storage.get('token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  this.editPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '编辑成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!'
+                  });
+                }
+              })
+            }
           }
         })
       },

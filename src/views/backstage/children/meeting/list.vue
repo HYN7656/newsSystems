@@ -196,7 +196,7 @@
           <el-upload
             ref="Addupload"
             class="upload-demo"
-            action="http://192.168.3.41:8083/newsInfo/newsFiles"
+            :action="uploadUrl()"
             :file-list="AddfileList"
             :auto-upload="true"
             :multiple="true"
@@ -342,7 +342,7 @@
           <el-upload
             ref="Editupload"
             class="upload-demo"
-            action="http://192.168.3.41:8083/newsInfo/newsFiles"
+            :action="uploadUrl()"
             :file-list="EditfileList"
             :multiple="true"
             :limit="5"
@@ -372,6 +372,7 @@
 </template>
 
 <script>
+  import config from "@/config/config.js";
   import {quillEditor} from 'vue-quill-editor'
   import * as Quill from 'quill' //引入编辑器
   //quill编辑器的字体
@@ -434,12 +435,15 @@
         rules: {
           mName: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ],
           mAddress: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ],
           mContacts: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
           ],
           data: [
             { required: true, message: '必填', trigger: 'blur' },
@@ -805,6 +809,10 @@
       // 文件上传部分
       handleExceed(files, fileList) {
         this.$message.warning(`当前已有${fileList.length} 个文件，限制选择5个文件，本次选择了 ${files.length} 个文件`);
+      },
+      // 上传文件地址
+      uploadUrl(){
+        return config.baseURL + '/newsInfo/newsFiles'
       },
       // 校验重置
       closeDialog(){
