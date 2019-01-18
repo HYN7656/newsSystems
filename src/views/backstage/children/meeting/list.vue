@@ -449,7 +449,8 @@
             { required: true, message: '必填', trigger: 'blur' },
           ],
           mPhone: [
-            {validator: checkPhone, trigger: 'blur'}
+            {validator: checkPhone, trigger: 'blur'},
+            { required: true, message: '必填', trigger: 'blur' },
           ]
 
           /* EditData: [
@@ -873,7 +874,7 @@
           params['mSystemId'] = storage.get('sysid');
           API.delete('/meeTing/delete', params,{Authorization:storage.get('token')}).then((res) => {
             console.log(res)
-            if (res.status == 200) {
+            if (res.data.code == 200) {
               this.$message({
                 type: 'success',
                 message: '删除成功!'

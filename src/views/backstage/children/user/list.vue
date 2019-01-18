@@ -418,8 +418,8 @@
           params['id'] = this.activeTableDataId2;
           params['uSystemId'] = storage.get('sysid');
           API.delete('/ususer/delete', params,{Authorization:storage.get('token')}).then((res) => {
-            console.log(res)
-            if (res.status == 200) {
+            console.log(res.data)
+            if (res.data.code == 200) {
               this.$message({
                 type: 'success',
                 message: '删除成功!'
@@ -430,7 +430,7 @@
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'
+                message: '删除失败!'+ res.data.message
               });
             }
           })
@@ -446,11 +446,9 @@
           let params = {};
           params['id'] = id;
           params['uSystemId'] = storage.get('sysid');
-          /*this.tableData = this.tableData.filter(ele => {
-            return ele.id != id;
-          })*/
           API.delete('/ususer/delete', params,{Authorization:storage.get('token')}).then((res) => {
-            if (res.status == 200) {
+            console.log(res.data)
+            if (res.data.code == 200) {
               this.getPage();
               this.$message({
                 type: 'success',
@@ -461,7 +459,7 @@
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'
+                message: '删除失败!'+ res.data.message
               });
             }
           })
