@@ -456,6 +456,8 @@
                     type: 'error',
                     message: '新增失败!'
                   });
+                  this.loadingBtn = false;
+                  this.num = 0;
                 }
               })
             }else {
@@ -589,6 +591,8 @@
                     type: 'error',
                     message: '编辑失败!'
                   });
+                  this.loadingBtn = false;
+                  this.num = 0;
                 }
               })
             }else {
