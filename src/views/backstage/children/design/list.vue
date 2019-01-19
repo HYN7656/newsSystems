@@ -352,7 +352,8 @@
           theme:'snow'
         },
         tableData: [],
-        top : 0
+        top : 0,
+        num : 0
       }
     },
     computed: {},
@@ -422,6 +423,7 @@
       addOpen() {
         this.addPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.AddfileList = [];
         this.addObject = {
           title: '',
@@ -443,48 +445,53 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传数据
-            var arr = [];
-            var arr2 = [];
-            console.log(this.AddfileList)
-            for (var i = 0; i < this.AddfileList.length; i++) {
-              if (this.AddfileList[i].response.code == '200') {
-                arr.push(this.AddfileList[i].response.data.revealImage);
-                arr2.push(this.AddfileList[i].response.data.imageName);
+            this.num ++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              // 上传数据
+              var arr = [];
+              var arr2 = [];
+              console.log(this.AddfileList)
+              for (var i = 0; i < this.AddfileList.length; i++) {
+                if (this.AddfileList[i].response.code == '200') {
+                  arr.push(this.AddfileList[i].response.data.revealImage);
+                  arr2.push(this.AddfileList[i].response.data.imageName);
+                }
               }
+              this.addObject.enclUrl = arr.join(',');
+              this.addObject.enclName = arr2.join(',');
+              let params = {};
+              params['title'] = this.addObject.title;
+              params['content'] = this.addObject.content;
+              params['contents'] = this.addObject.contents.replace(/[\r\n]/g, "");
+              params['iId'] = this.addObject.iId;
+              params['enclUrl'] = this.addObject.enclUrl;
+              params['enclName'] = this.addObject.enclName;
+              params['author'] = this.addObject.author;
+              params['dFrom'] = this.addObject.dFrom;
+              params['systemId'] = storage.get('sysid');
+              console.log(params)
+              API.post('/design/create', params,{Authorization:storage.get('token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '新增失败!'
+                  });
+                }
+              })
+            }else {
+              return;
             }
-            this.addObject.enclUrl = arr.join(',');
-            this.addObject.enclName = arr2.join(',');
-            let params = {};
-            params['title'] = this.addObject.title;
-            params['content'] = this.addObject.content;
-            params['contents'] = this.addObject.contents.replace(/[\r\n]/g, "");
-            params['iId'] = this.addObject.iId;
-            params['enclUrl'] = this.addObject.enclUrl;
-            params['enclName'] = this.addObject.enclName;
-            params['author'] = this.addObject.author;
-            params['dFrom'] = this.addObject.dFrom;
-            params['systemId'] = storage.get('sysid');
-            console.log(params)
-            API.post('/design/create', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'
-                });
-              }
-            })
           }
         })
       },
@@ -503,6 +510,7 @@
         }
         this.editPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.EditfileList = [];
         this.editObject = {
           title: '',
@@ -538,54 +546,59 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传部分
-            var arr = [];
-            var arr2 = [];
-            for (var i = 0; i < this.EditfileList.length; i++) {
-              if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                arr.push(this.EditfileList[i].response.data.revealImage);
-                arr2.push(this.EditfileList[i].response.data.imageName);
-              } else {
-                arr.push(this.EditfileList[i].url)
-                arr2.push(this.EditfileList[i].name)
+            this.num ++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              // 上传部分
+              var arr = [];
+              var arr2 = [];
+              for (var i = 0; i < this.EditfileList.length; i++) {
+                if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                  arr.push(this.EditfileList[i].response.data.revealImage);
+                  arr2.push(this.EditfileList[i].response.data.imageName);
+                } else {
+                  arr.push(this.EditfileList[i].url)
+                  arr2.push(this.EditfileList[i].name)
+                }
               }
-            }
-            this.editObject.enclUrl = arr.join(',');
-            this.editObject.enclName = arr2.join(',');
-            let params = {};
-            params['id'] = this.editObject.id;
-            params['title'] = this.editObject.title;
-            params['content'] = this.editObject.content;
-            if(this.editObject.contents){
-              params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+              this.editObject.enclUrl = arr.join(',');
+              this.editObject.enclName = arr2.join(',');
+              let params = {};
+              params['id'] = this.editObject.id;
+              params['title'] = this.editObject.title;
+              params['content'] = this.editObject.content;
+              if(this.editObject.contents){
+                params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+              }else {
+                params['contents'] = '';
+              }
+              params['iId'] = this.editObject.iId;
+              params['enclUrl'] = this.editObject.enclUrl;
+              params['enclName'] = this.editObject.enclName;
+              params['author'] = this.editObject.author;
+              params['dFrom'] = this.editObject.dFrom;
+              params['systemId'] = storage.get('sysid');
+              console.log(params)
+              API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
+                if (res.data.code == 200) {
+                  this.editPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '编辑成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!'
+                  });
+                }
+              })
             }else {
-              params['contents'] = '';
+              return;
             }
-            params['iId'] = this.editObject.iId;
-            params['enclUrl'] = this.editObject.enclUrl;
-            params['enclName'] = this.editObject.enclName;
-            params['author'] = this.editObject.author;
-            params['dFrom'] = this.editObject.dFrom;
-            params['systemId'] = storage.get('sysid');
-            console.log(params)
-            API.put('/design/update', params,{Authorization:storage.get('token')}).then((res) => {
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'
-                });
-              }
-            })
           }
         })
       },

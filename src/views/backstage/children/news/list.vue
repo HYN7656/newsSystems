@@ -159,7 +159,7 @@
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'>确 定</el-button>
+        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'> 确 定</el-button>
         <el-button @click="addPop = false;loadingBtn=false" class="cancelAdd">取 消</el-button>
       </div>
     </el-dialog>
@@ -257,6 +257,7 @@
     components: {quillEditor},
     data() {
       return {
+        abc:false,
         loadingBtn:false,
         loading: false,
         editPop: false,
@@ -336,7 +337,8 @@
           },
           theme:'snow'
         },
-        tableData: []
+        tableData: [],
+        num : 0
       }
     },
     computed: {},
@@ -390,6 +392,7 @@
       addOpen() {
         this.addPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.AddfileList = [];
         this.addObject = {
           fTitle: '',
@@ -412,47 +415,54 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传数据
-            var arr = [];
-            var arr2 = [];
-            for (var i = 0; i < this.AddfileList.length; i++) {
-              if (this.AddfileList[i].response.code == '200') {
-                arr.push(this.AddfileList[i].response.data.revealImage);
-                arr2.push(this.AddfileList[i].response.data.imageName);
+            this.num ++;
+            if(this.num == 1){
+              this.loadingBtn = true;
+              // 上传数据
+              var arr = [];
+              var arr2 = [];
+              for (var i = 0; i < this.AddfileList.length; i++) {
+                if (this.AddfileList[i].response.code == '200') {
+                  arr.push(this.AddfileList[i].response.data.revealImage);
+                  arr2.push(this.AddfileList[i].response.data.imageName);
+                }
               }
+              this.addObject.fEnclUrl = arr.join(',');
+              this.addObject.fEnclName = arr2.join(',');
+              let params = {};
+              params['fTitle'] = this.addObject.fTitle;
+              params['fContent'] = this.addObject.fContent;
+              params['fContents'] = this.addObject.fContents.replace(/[\r\n]/g, "");
+              params['fImgUrl'] = this.addObject.furl;
+              params['fEnclUrl'] = this.addObject.fEnclUrl;
+              params['fEnclName'] = this.addObject.fEnclName;
+              params['fAuthor'] = this.addObject.fAuthor;
+              params['fFrom'] = this.addObject.fFrom;
+              params['fSystemId'] = storage.get('sysid');
+              console.log(params)
+              API.post('/newsInfo/create', params,{Authorization:storage.get('token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '新增失败!'
+                  });
+                }
+              })
+            }else {
+              return;
             }
-            this.addObject.fEnclUrl = arr.join(',');
-            this.addObject.fEnclName = arr2.join(',');
-            let params = {};
-            params['fTitle'] = this.addObject.fTitle;
-            params['fContent'] = this.addObject.fContent;
-            params['fContents'] = this.addObject.fContents.replace(/[\r\n]/g, "");
-            params['fImgUrl'] = this.addObject.furl;
-            params['fEnclUrl'] = this.addObject.fEnclUrl;
-            params['fEnclName'] = this.addObject.fEnclName;
-            params['fAuthor'] = this.addObject.fAuthor;
-            params['fFrom'] = this.addObject.fFrom;
-            params['fSystemId'] = storage.get('sysid');
-            console.log(params)
-            API.post('/newsInfo/create', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'
-                });
-              }
-            })
+          }else {
+            this.loadingBtn = false;
           }
         })
       },
@@ -483,6 +493,7 @@
         }
         this.editPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.EditfileList = [];
         this.editObject = {
           fTitle: '',
@@ -522,50 +533,67 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传部分
-            var arr = [];
-            var arr2 = [];
-            for (var i = 0; i < this.EditfileList.length; i++) {
-              if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                arr.push(this.EditfileList[i].response.data.revealImage);
-                arr2.push(this.EditfileList[i].response.data.imageName);
-              } else {
-                arr.push(this.EditfileList[i].url)
-                arr2.push(this.EditfileList[i].name)
+            this.num ++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              // 上传部分
+              var arr = [];
+              var arr2 = [];
+              for (var i = 0; i < this.EditfileList.length; i++) {
+                if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                  arr.push(this.EditfileList[i].response.data.revealImage);
+                  arr2.push(this.EditfileList[i].response.data.imageName);
+                } else {
+                  arr.push(this.EditfileList[i].url)
+                  arr2.push(this.EditfileList[i].name)
+                }
               }
+              this.editObject.fEnclUrl = arr.join(',');
+              this.editObject.fEnclName = arr2.join(',');
+              function find(str, cha, num) {
+                var x = str.indexOf(cha);
+                for (var i = 0; i < num - 1; i++) {
+                  x = str.indexOf(cha, x + 1);
+                }
+                return x;
+              }
+
+              let params = {};
+              params['id'] = this.editObject.id;
+              params['fTitle'] = this.editObject.fTitle;
+              params['fContent'] = this.editObject.fContent;
+              params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
+              if (this.editObject.furl.indexOf('http://') != -1) {
+                params['fImgUrl'] = this.editObject.furl.slice(parseInt(find(this.editObject.furl, '/', 3)));
+              } else {
+                params['fImgUrl'] = this.editObject.furl;
+              }
+              params['fEnclUrl'] = this.editObject.fEnclUrl;
+              params['fEnclName'] = this.editObject.fEnclName;
+              params['fAuthor'] = this.editObject.fAuthor;
+              params['fFrom'] = this.editObject.fFrom;
+              params['fSystemId'] = storage.get('sysid');
+              console.log(params)
+              API.put('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+                if (res.data.code == 200) {
+                  this.editPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '编辑成功!'
+                  });
+                } else if (res.data.code == 1001) {
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!'
+                  });
+                }
+              })
+            }else {
+              return;
             }
-            this.editObject.fEnclUrl = arr.join(',');
-            this.editObject.fEnclName = arr2.join(',');
-            let params = {};
-            params['id'] = this.editObject.id;
-            params['fTitle'] = this.editObject.fTitle;
-            params['fContent'] = this.editObject.fContent;
-            params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
-            params['fImgUrl'] = this.editObject.furl;
-            params['fEnclUrl'] = this.editObject.fEnclUrl;
-            params['fEnclName'] = this.editObject.fEnclName;
-            params['fAuthor'] = this.editObject.fAuthor;
-            params['fFrom'] = this.editObject.fFrom;
-            params['fSystemId'] = storage.get('sysid');
-            console.log(params)
-            API.put('/newsInfo/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'
-                });
-              }
-            })
           }
         })
       },

@@ -205,20 +205,6 @@
         <el-row>
           <el-col :span="11">
             <div class="cell">
-              <span class="name">缩略图：</span>
-              <el-upload
-                class="avatar-uploader"
-                :action="uploadUrlImg()"
-                :show-file-list="false"
-                :on-success="succImgAdd"
-                :headers="myHeaders">
-                <img v-if="addObject.nImgUrl" :src="addObject.nImgUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="cell">
               <span class="name">上传附件：</span>
               <el-upload
                 ref="Addupload"
@@ -236,6 +222,8 @@
                 <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
               </el-upload>
             </div>
+          </el-col>
+          <el-col :span="11" :offset="2">
           </el-col>
         </el-row>
         <div class="cell" style="margin-top: 20px;">
@@ -295,20 +283,6 @@
         <el-row>
           <el-col :span="11">
             <div class="cell">
-              <span class="name">缩略图：</span>
-              <el-upload
-                class="avatar-uploader"
-                :action="uploadUrlImg()"
-                :show-file-list="false"
-                :on-success="succImgEdit"
-                :headers="myHeaders">
-                <img v-if="editObject.nImgUrl" :src="editObject.nImgUrl" class="avatar">
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-              </el-upload>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="cell">
               <span class="name">上传附件：</span>
               <el-upload
                 ref="Editupload"
@@ -325,6 +299,8 @@
                 <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
               </el-upload>
             </div>
+          </el-col>
+          <el-col :span="11" :offset="2">
           </el-col>
         </el-row>
         <div class="cell" style="margin-top: 20px;">
@@ -469,6 +445,7 @@
           },
           theme:'snow'
         },
+        num:0
 
 
       }
@@ -530,6 +507,7 @@
         this.addPop = true;
         this.loadingBtn = false;
         this.AddfileList = [];
+        this.num = 0;
         this.addObject = {
           nTitle: '',
           nImgUrl : '',
@@ -552,58 +530,62 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传数据
-            var arr = [];
-            var arr2 = [];
-            for (var i = 0; i < this.AddfileList.length; i++) {
-              if (this.AddfileList[i].response.code == '200') {
-                arr.push(this.AddfileList[i].response.data.revealImage);
-                arr2.push(this.AddfileList[i].response.data.imageName);
+            this.num++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              // 上传数据
+              var arr = [];
+              var arr2 = [];
+              for (var i = 0; i < this.AddfileList.length; i++) {
+                if (this.AddfileList[i].response.code == '200') {
+                  arr.push(this.AddfileList[i].response.data.revealImage);
+                  arr2.push(this.AddfileList[i].response.data.imageName);
+                }
               }
-            }
-            this.addObject.nEnclUrl = arr.join(',');
-            this.addObject.nEnclName = arr2.join(',');
-            let params = {};
-            params['nTitle'] = this.addObject.nTitle;
-            params['nContent'] = this.addObject.nContent;
-            if(this.addObject.nContents){
-              params['nContents'] = this.addObject.nContents.replace(/[\r\n]/g, "");
-            }else {
-              params['nContents'] = '';
-            }
-
-            params['nImgUrl'] = this.addObject.nurl;
-            params['nAuthor'] = this.addObject.nAuthor;
-            params['nFrom'] = this.addObject.nFrom;
-            params['nEnclUrl'] = this.addObject.nEnclUrl;
-            params['nEnclName'] = this.addObject.nEnclName;
-            params['iId'] = this.addObject.iId;
-            params['nSystemId'] = storage.get('sysid');
-            console.log(params)
-            API.post('/notice/create', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'
-                });
+              this.addObject.nEnclUrl = arr.join(',');
+              this.addObject.nEnclName = arr2.join(',');
+              let params = {};
+              params['nTitle'] = this.addObject.nTitle;
+              params['nContent'] = this.addObject.nContent;
+              if(this.addObject.nContents){
+                params['nContents'] = this.addObject.nContents.replace(/[\r\n]/g, "");
+              }else {
+                params['nContents'] = '';
               }
-            })
+              // params['nImgUrl'] = this.addObject.nurl;
+              params['nAuthor'] = this.addObject.nAuthor;
+              params['nFrom'] = this.addObject.nFrom;
+              params['nEnclUrl'] = this.addObject.nEnclUrl;
+              params['nEnclName'] = this.addObject.nEnclName;
+              params['iId'] = this.addObject.iId;
+              params['nSystemId'] = storage.get('sysid');
+              console.log(params)
+              API.post('/notice/create', params,{Authorization:storage.get('token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '新增失败!'
+                  });
+                }
+              })
+            }else{
+              return;
+            }
           }
         })
       },
       // 新增图片上传
-      succImgAdd(response, file, fileList) {
+      /*succImgAdd(response, file, fileList) {
         let fileName = file.name;
         let regex = /(.jpg|.jpeg|.gif|.png|.bmp)$/;
         if (regex.test(fileName.toLowerCase())) {
@@ -612,7 +594,7 @@
         } else {
           this.$message.error('请选择图片文件');
         }
-      },
+      },*/
       // 新增上传功能成功
       succAdd(response, file, fileList) {
         this.AddfileList = fileList;
@@ -628,6 +610,7 @@
         }
         this.editPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.EditfileList = [];
         this.editObject = {
           nTitle: '',
@@ -647,8 +630,9 @@
           console.log(res.data)
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
-            this.editObject.nImgUrl = config.baseURL + res.data.data.data.nImgUrl;
-            this.editObject.nurl = this.editObject.nImgUrl;
+            // this.editObject.nImgUrl = config.baseURL + res.data.data.data.nImgUrl;
+            // console.log(this.editObject.nImgUrl)
+            // this.editObject.nurl = this.editObject.nImgUrl;
             // 上传列表
             this.EditfileList = res.data.data.file;
             var obj = [];
@@ -667,62 +651,71 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // 上传部分
-            var arr = [];
-            var arr2 = [];
-            for (var i = 0; i < this.EditfileList.length; i++) {
-              if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                arr.push(this.EditfileList[i].response.data.revealImage);
-                arr2.push(this.EditfileList[i].response.data.imageName);
-              } else {
-                arr.push(this.EditfileList[i].url)
-                arr2.push(this.EditfileList[i].name)
+            this.num ++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              // 上传部分
+              var arr = [];
+              var arr2 = [];
+              for (var i = 0; i < this.EditfileList.length; i++) {
+                if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                  arr.push(this.EditfileList[i].response.data.revealImage);
+                  arr2.push(this.EditfileList[i].response.data.imageName);
+                } else {
+                  arr.push(this.EditfileList[i].url)
+                  arr2.push(this.EditfileList[i].name)
+                }
               }
-            }
-            this.editObject.nEnclUrl = arr.join(',');
-            this.editObject.nEnclName = arr2.join(',');
-            // console.log(this.editObject.nContents)
-            // console.log(this.editObject.nurl)
-            let params = {};
-            params['id'] = this.editObject.id;
-            params['nTitle'] = this.editObject.nTitle;
-            params['nContent'] = this.editObject.nContent;
-            if(this.editObject.nContents){
-              params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+              this.editObject.nEnclUrl = arr.join(',');
+              this.editObject.nEnclName = arr2.join(',');
+              function find(str,cha,num){
+                var x=str.indexOf(cha);
+                for(var i=0;i<num-1;i++){
+                  x=str.indexOf(cha,x+1);
+                }
+                return x;
+              }
+              let params = {};
+              params['id'] = this.editObject.id;
+              params['nTitle'] = this.editObject.nTitle;
+              params['nContent'] = this.editObject.nContent;
+              if(this.editObject.nContents){
+                params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+              }else {
+                params['nContents'] = '';
+              }
+              params['nAuthor'] = this.editObject.nAuthor;
+              params['nFrom'] = this.editObject.nFrom;
+              params['nEnclUrl'] = this.editObject.nEnclUrl;
+              params['nEnclName'] = this.editObject.nEnclName;
+              params['iId'] = this.editObject.iId;
+              params['nSystemId'] = storage.get('sysid');
+              console.log(params)
+              API.put('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+                if (res.data.code == 200) {
+                  this.editPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '编辑成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!'
+                  });
+                }
+              })
             }else {
-              params['nContents'] = '';
+              return;
             }
-            params['nImgUrl'] = this.editObject.nurl;
-            params['nAuthor'] = this.editObject.nAuthor;
-            params['nFrom'] = this.editObject.nFrom;
-            params['nEnclUrl'] = this.editObject.nEnclUrl;
-            params['nEnclName'] = this.editObject.nEnclName;
-            params['iId'] = this.editObject.iId;
-            params['nSystemId'] = storage.get('sysid');
-            console.log(params)
-            API.put('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut()
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'
-                });
-              }
-            })
           }
         })
       },
       // 编辑图片上传
-      succImgEdit(response, file, fileList) {
+      /*succImgEdit(response, file, fileList) {
         let fileName = file.name;
         let regex = /(.jpg|.jpeg|.gif|.png|.bmp)$/;
         if (regex.test(fileName.toLowerCase())) {
@@ -731,7 +724,7 @@
         } else {
           this.$message.error('请选择图片文件');
         }
-      },
+      },*/
       // 编辑上传功能成功
       succEdit(response, file, fileList) {
         this.EditfileList = fileList;
@@ -745,9 +738,9 @@
         this.$message.warning(`当前已有${fileList.length} 个文件，限制选择5个文件，本次选择了 ${files.length} 个文件`);
       },
       // 上传图片地址
-      uploadUrlImg(){
+      /*uploadUrlImg(){
         return config.baseURL + '/newsInfo/newsFile'
-      },
+      },*/
       // 上传文件地址
       uploadUrl(){
         return config.baseURL + '/newsInfo/newsFiles'
