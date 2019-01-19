@@ -77,7 +77,7 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加会议" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加会议" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="120px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -220,12 +220,12 @@
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd">确 定</el-button>
-        <el-button @click="addPop = false" class="cancelAdd">取 消</el-button>
+        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="addPop = false;loadingBtn=false" class="cancelAdd">取 消</el-button>
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="120px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -364,8 +364,8 @@
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editSave('editObject')" class="confirmTip">确 定</el-button>
-        <el-button @click="editPop = false" class="cancelTip">取 消</el-button>
+        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="editPop = false;loadingBtn=false" class="cancelTip">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -385,19 +385,21 @@
     components: {quillEditor},
     data() {
       var checkPhone = (rule, value, callback) => {
-        if (!value) {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        console.log(reg.test(value));
+        if (reg.test(value)) {
+          callback();
+        } else {
+          return callback(new Error('请输入正确的手机号'));
+        }
+        /*if (!value) {
           return ;
         } else {
-          const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
-          console.log(reg.test(value));
-          if (reg.test(value)) {
-            callback();
-          } else {
-            return callback(new Error('请输入正确的手机号'));
-          }
-        }
+
+        }*/
       };
       return {
+        loadingBtn:false,
         loading: false,
         editPop: false,
         addPop: false,
@@ -519,7 +521,7 @@
             onClick(picker) {
               const end = new Date();
               const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              end.setTime(start.getTime() + 3600 * 1000 * 24 * 7);
               picker.$emit('pick', [start, end]);
             }
           }, {
@@ -527,7 +529,7 @@
             onClick(picker) {
               const end = new Date();
               const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+              end.setTime(start.getTime() + 3600 * 1000 * 24 * 30);
               picker.$emit('pick', [start, end]);
             }
           }, {
@@ -535,7 +537,7 @@
             onClick(picker) {
               const end = new Date();
               const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+              end.setTime(start.getTime() + 3600 * 1000 * 24 * 90);
               picker.$emit('pick', [start, end]);
             }
           }]
@@ -588,6 +590,7 @@
       // 新增
       addOpen() {
         this.addPop = true;
+        this.loadingBtn = false;
         this.AddfileList = [];
         this.addObject = {
           mName: '',
@@ -616,6 +619,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             console.log(this.addObject)
+            this.loadingBtn = true;
             // 上传数据
             var arr = [];
             var arr2 = [];
@@ -697,6 +701,7 @@
         this.EditData = [];
         this.EditfileList = [];
         this.editPop = true;
+        this.loadingBtn = false;
         console.log(this.editObject.data)
         let params = {};
         params['id'] = id;
@@ -743,6 +748,7 @@
           this.$refs[formName].validate((valid) => {
             if (valid) {
               console.log(this.editObject)
+              this.loadingBtn = true;
               // 上传部分
               var arr = [];
               var arr2 = [];

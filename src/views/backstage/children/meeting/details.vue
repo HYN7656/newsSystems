@@ -21,7 +21,7 @@
         <div class="img"><img class="ewm pic" src="../../../../assets/images/erwm.png"></div>
         <div class="detail">
           <div class="title">{{datail.mName}}</div>
-          <div class="time"><i class="icon iconfont icon-shijian"></i>{{datail.mStartTime}} -- {{datail.mEndTime}}</div>
+          <div class="time"><i class="icon iconfont icon-shijian"></i>{{datail.startTime}} -- {{datail.endTime}}</div>
           <div class="address"><i class="icon iconfont icon-dingweiweizhi"></i>{{datail.mAddress}}</div>
           <div class="btn">在线报名</div>
           <div class="wechart">
@@ -126,11 +126,14 @@
           API.get('/meeTing/FindById', params,{Authorization:storage.get('token')}).then((res) => {
             console.log(res.data)
             if(res.data.code == 200) {
-              this.datail = res.data.data.data;
               this.file = res.data.data.file;
               for(var i=0;i<this.file.length;i++){
                 this.file[i].url = config.baseURL + this.file[i].fenclUrl;
               }
+              var arr = Object.assign({},  res.data.data.data);
+              arr.startTime = arr.mStartTime.slice(0,19)
+              arr.endTime = arr.mEndTime.slice(0,19)
+              this.datail = arr;
               this.partakeHost = res.data.data.data.mHostUnit.split(',');
               this.partakeCompany = res.data.data.data.mParticipatingUnits.split(',');
             }else if(res.data.code == 1001){

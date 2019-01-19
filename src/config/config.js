@@ -7,7 +7,8 @@ export default {
 
   url: '',
 
-  baseURL: 'http://192.168.3.41:8083',
+  // baseURL: 'http://192.168.3.41:8083',
+  baseURL: 'http://192.168.206.113:8083',
   // baseURL: 'http://moka.dino-tech.com/airapi',
 
   secret: '888A9AE0E1EEE6A7421D7C8774BD41FC',

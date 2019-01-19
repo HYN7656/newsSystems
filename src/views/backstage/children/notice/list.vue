@@ -165,7 +165,7 @@
       </div>
     </el-dialog>
     <!--添加弹框-->
-    <el-dialog title="添加公告" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加公告" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
       <div class="content" >
         <div class="cell">
@@ -250,12 +250,12 @@
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd">确 定</el-button>
-        <el-button @click="addPop = false" class="cancelAdd">取 消</el-button>
+        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="addPop = false;loadingBtn=false" class="cancelAdd">取 消</el-button>
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -339,8 +339,8 @@
       </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editSave('editObject')" class="confirmTip">确 定</el-button>
-        <el-button @click="editPop = false" class="cancelTip">取 消</el-button>
+        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="editPop = false;loadingBtn=false" class="cancelTip">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -360,6 +360,7 @@
     components: {quillEditor},
     data() {
       return {
+        loadingBtn:false,
         loading: false,
         editPop: false,
         addPop: false,
@@ -527,6 +528,7 @@
       //新增
       addOpen() {
         this.addPop = true;
+        this.loadingBtn = false;
         this.AddfileList = [];
         this.addObject = {
           nTitle: '',
@@ -550,6 +552,7 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            this.loadingBtn = true;
             // 上传数据
             var arr = [];
             var arr2 = [];
@@ -624,6 +627,7 @@
           this.$refs.editObject.clearValidate();
         }
         this.editPop = true;
+        this.loadingBtn = false;
         this.EditfileList = [];
         this.editObject = {
           nTitle: '',
@@ -663,6 +667,7 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
+            this.loadingBtn = true;
             // 上传部分
             var arr = [];
             var arr2 = [];

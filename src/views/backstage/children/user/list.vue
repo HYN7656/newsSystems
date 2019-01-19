@@ -52,62 +52,62 @@
       </el-table>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
-      <div class="content">
-        <div class="cell">
-          <el-form-item label="用户名：" prop="uName">
-          <!--<span class="name">用户名：</span>-->
-          <el-input v-model="addObject.uName" placeholder="请输入内容" class="flew-input"></el-input>
-          </el-form-item>
-        </div>
-        <div class="cell qx">
-          <span class="name" style="padding-left: 15px;"><span style="color: #f56c6c">*</span>权限：</span>
-          <div class="qx-div">
-            <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="AddAllhandleChecked">全选
-            </el-checkbox>
-            <div style="margin: 15px 0;"></div>
-            <el-checkbox-group v-model="checkedCities" @change="AddhandleChecked">
-              <el-checkbox v-for="p in power" :label="p.qName" :key="p.id">{{p.qName}}</el-checkbox>
-            </el-checkbox-group>
+        <div class="content">
+          <div class="cell">
+            <el-form-item label="用户名：" prop="uName">
+              <!--<span class="name">用户名：</span>-->
+              <el-input v-model="addObject.uName" placeholder="请输入内容" class="flew-input"></el-input>
+            </el-form-item>
+          </div>
+          <div class="cell qx">
+            <span class="name" style="padding-left: 15px;"><span style="color: #f56c6c">*</span>权限：</span>
+            <div class="qx-div">
+              <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="AddAllhandleChecked">全选
+              </el-checkbox>
+              <div style="margin: 15px 0;"></div>
+              <el-checkbox-group v-model="checkedCities" @change="AddhandleChecked">
+                <el-checkbox v-for="p in power" :label="p.qName" :key="p.id">{{p.qName}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
           </div>
         </div>
-      </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd">确 定</el-button>
-        <el-button @click="addPop = false" class="cancelAdd">取 消</el-button>
+        <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="addPop = false;loadingBtn=false" class="cancelAdd">取 消</el-button>
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog v-bind:title="title" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog v-bind:title="title" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
-      <div class="content">
-        <div class="cell">
-          <el-form-item label="用户名：" prop="uName">
-          <!--<span class="name">用户名：</span>-->
-          <el-input v-model="editObject.uName" placeholder="请输入内容" class="flew-input"
-                    v-bind:disabled="look"></el-input>
-          </el-form-item>
-        </div>
-        <div class="cell qx">
-          <span class="name" style="padding-left: 15px;">权限：</span>
-          <div class="qx-div">
-            <el-checkbox :indeterminate="EditisIndeterminate" v-model="EditcheckAll" @change="EditAllhandleChecked"
-                         v-bind:disabled="look">全选
-            </el-checkbox>
-            <div style="margin: 15px 0;"></div>
-            <el-checkbox-group v-model="EditcheckedCities" @change="EdithandleChecked">
-              <el-checkbox v-for="p in power" :label="p.qName" :key="p.id" v-bind:disabled="look">{{p.qName}}
+        <div class="content">
+          <div class="cell">
+            <el-form-item label="用户名：" prop="uName">
+              <!--<span class="name">用户名：</span>-->
+              <el-input v-model="editObject.uName" placeholder="请输入内容" class="flew-input"
+                        v-bind:disabled="look"></el-input>
+            </el-form-item>
+          </div>
+          <div class="cell qx">
+            <span class="name" style="padding-left: 15px;">权限：</span>
+            <div class="qx-div">
+              <el-checkbox :indeterminate="EditisIndeterminate" v-model="EditcheckAll" @change="EditAllhandleChecked"
+                           v-bind:disabled="look">全选
               </el-checkbox>
-            </el-checkbox-group>
+              <div style="margin: 15px 0;"></div>
+              <el-checkbox-group v-model="EditcheckedCities" @change="EdithandleChecked">
+                <el-checkbox v-for="p in power" :label="p.qName" :key="p.id" v-bind:disabled="look">{{p.qName}}
+                </el-checkbox>
+              </el-checkbox-group>
+            </div>
           </div>
         </div>
-      </div>
       </el-form>
       <div slot="footer" class="dialog-footer" v-show="!look">
-        <el-button type="primary" @click="editSave('editObject')" class="confirmTip">确 定</el-button>
-        <el-button @click="editPop = false" class="cancelTip">取 消</el-button>
+        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" :loading='loadingBtn'>确 定</el-button>
+        <el-button @click="editPop = false;loadingBtn=false" class="cancelTip">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -118,12 +118,13 @@
     name: '',
     data() {
       return {
+        loadingBtn:false,
         loading: false,
         editPop: false,
         addPop: false,
         checkAll: false,
         look: false,
-        uSystemId : 1,
+        uSystemId: 1,
         title: "编辑",
         // 搜索初始化
         SearchInp: '',
@@ -142,7 +143,7 @@
         EditcheckedCities: [],
         EditisIndeterminate: true,
         EditcheckAll: false,
-
+        UName:'',
         addObject: {
           uName: '',
           powerList: []
@@ -154,8 +155,8 @@
         },
         rules: {
           uName: [
-            { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+            {required: true, message: '必填', trigger: 'blur'},
+            {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
           ]
         },
       }
@@ -164,21 +165,21 @@
       // 页面初始化
       getPage() {
         let params = {};
-        API.get('/ususer/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/ususer/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
             console.log(res.data)
             this.tableData = res.data.data;
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut()
           } else {
             console.log(res.data)
           }
         })
-        API.get('/juris/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/juris/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.power = res.data.data;
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut()
           } else {
             console.log(res.data)
@@ -189,11 +190,11 @@
       search() {
         let params = {};
         params['name'] = this.SearchInp;
-        API.get('/ususer/FindByName', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/ususer/FindByName', params, {Authorization: storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.tableData = res.data.data;
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut()
           } else {
             console.log(res.data)
@@ -205,13 +206,14 @@
       addOpen() {
         this.checkedCities = [];
         this.addPop = true;
+        this.loadingBtn = false;
         this.addObject = {
           uName: '',
           powerList: []
         }
-        if(this.$refs.addObject){
+        if (this.$refs.addObject) {
           this.$refs.addObject.clearValidate();
-        }else {
+        } else {
           return
         }
       },
@@ -219,18 +221,19 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            if(!this.addObject.powerList.length){
+            if (!this.addObject.powerList.length) {
               this.$message({
                 type: 'error',
                 message: '请选择权限!'
               });
-            }else {
+            } else {
+              this.loadingBtn = true;
               let params = {};
               params['uName'] = this.addObject.uName;
               params['qId'] = this.addObject.powerList;
               params['uSystemId'] = this.uSystemId;
               console.log(params)
-              API.post('/ususer/create', params,{Authorization:storage.get('token')}).then((res) => {
+              API.post('/ususer/create', params, {Authorization: storage.get('token')}).then((res) => {
                 console.log(res.data)
                 if (res.data.code == 200) {
                   this.addPop = false;
@@ -239,12 +242,12 @@
                     type: 'success',
                     message: '新增成功!'
                   });
-                } else if(res.data.code == 1001){
+                } else if (res.data.code == 1001) {
                   this.signOut()
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '新增失败!'+res.data.message
+                    message: '新增失败!' + res.data.message
                   });
                 }
               })
@@ -282,10 +285,11 @@
       },
       // 编辑
       editOpen(id) {
-        if(this.$refs.editObject){
+        if (this.$refs.editObject) {
           this.$refs.editObject.clearValidate();
         }
         this.look = false;
+        this.loadingBtn = false;
         this.title = "编辑";
         this.EditcheckedCities = [];
         this.editObject = {
@@ -296,11 +300,12 @@
         this.editPop = true;
         let params = {};
         params['id'] = id;
-        API.get('/ususer/FindByid', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/ususer/FindByid', params, {Authorization: storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.editObject = res.data.data;
             this.editObject.uName = res.data.data.uname;
+            this.UName = res.data.data.uname;
             arr = res.data.data.qid;
             this.editObject.powerList = Array.prototype.slice.call(arr);
             this.editObject.powerList = arr;
@@ -314,7 +319,7 @@
             }
             console.log(this.EditcheckedCities)
             console.log(this.editObject.powerList)
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut()
           } else {
             console.log(res.data)
@@ -325,38 +330,83 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            if(!this.editObject.powerList.length){
+            if (!this.editObject.powerList.length) {
               this.$message({
                 type: 'error',
                 message: '请选择权限!'
               });
-            }else{
-              var params = {
-                qId: []
-              };
-              params['id'] = this.editObject.id;
-              params['uName'] = this.editObject.uName;
-              params['qId'] = this.editObject.powerList.join(',');
-              params['uSystemId'] = this.uSystemId;
-              console.log(params)
-              API.put('/ususer/update', params,{Authorization:storage.get('token')}).then((res) => {
+            } else {
+              if(this.UName == this.editObject.uName){
+                this.loadingBtn = true;
+                var params = {
+                  qId: []
+                };
+                params['id'] = this.editObject.id;
+                params['uName'] = this.editObject.uName;
+                params['qId'] = this.editObject.powerList.join(',');
+                params['uSystemId'] = this.uSystemId;
+                console.log(params)
+                API.put('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
+                  console.log(res.data)
+                  if (res.data.code == 200) {
+                    this.editPop = false;
+                    this.getPage();
+                    this.$message({
+                      type: 'success',
+                      message: '编辑成功!'
+                    });
+                  } else if (res.data.code == 1001) {
+                    this.signOut()
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '编辑失败!'
+                    });
+                  }
+                })
+              }else {
+                var name = {}
+              name['name'] = this.editObject.uName;
+              API.get('/ususer/shiroByName', name, {Authorization: storage.get('token')}).then((res) => {
                 console.log(res.data)
                 if (res.data.code == 200) {
-                  this.editPop = false;
-                  this.getPage();
-                  this.$message({
-                    type: 'success',
-                    message: '编辑成功!'
-                  });
-                } else if(res.data.code == 1001){
+                  this.loadingBtn = true;
+                  var params = {
+                    qId: []
+                  };
+                  params['id'] = this.editObject.id;
+                  params['uName'] = this.editObject.uName;
+                  params['qId'] = this.editObject.powerList.join(',');
+                  params['uSystemId'] = this.uSystemId;
+                  console.log(params)
+                  API.put('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
+                    console.log(res.data)
+                    if (res.data.code == 200) {
+                      this.editPop = false;
+                      this.getPage();
+                      this.$message({
+                        type: 'success',
+                        message: '编辑成功!'
+                      });
+                    } else if (res.data.code == 1001) {
+                      this.signOut()
+                    } else {
+                      this.$message({
+                        type: 'error',
+                        message: '编辑失败!'
+                      });
+                    }
+                  })
+                } else if (res.data.code == 1001) {
                   this.signOut()
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '编辑失败!'
+                    message: '编辑失败!' + res.data.message
                   });
                 }
               })
+              }
             }
           }
         })
@@ -406,7 +456,7 @@
           return
         }
         this.multipleSelection.forEach(ele => {
-          this.activeTableDataId.push( ele.id )
+          this.activeTableDataId.push(ele.id)
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -417,7 +467,7 @@
           let params = {};
           params['id'] = this.activeTableDataId2;
           params['uSystemId'] = storage.get('sysid');
-          API.delete('/ususer/delete', params,{Authorization:storage.get('token')}).then((res) => {
+          API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
             console.log(res.data)
             if (res.data.code == 200) {
               this.$message({
@@ -425,12 +475,12 @@
                 message: '删除成功!'
               });
               this.getPage();
-            } else if(res.data.code == 1001){
+            } else if (res.data.code == 1001) {
               this.signOut()
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'+ res.data.message
+                message: '删除失败!' + res.data.message
               });
             }
           })
@@ -446,7 +496,7 @@
           let params = {};
           params['id'] = id;
           params['uSystemId'] = storage.get('sysid');
-          API.delete('/ususer/delete', params,{Authorization:storage.get('token')}).then((res) => {
+          API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
             console.log(res.data)
             if (res.data.code == 200) {
               this.getPage();
@@ -454,12 +504,12 @@
                 type: 'success',
                 message: '删除成功!'
               });
-            } else if(res.data.code == 1001){
+            } else if (res.data.code == 1001) {
               this.signOut()
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'+ res.data.message
+                message: '删除失败!' + res.data.message
               });
             }
           })
@@ -478,7 +528,7 @@
         this.editPop = true;
         this.title = "详情";
       },
-      signOut(){
+      signOut() {
         this.$message({
           type: 'error',
           message: '登录失效，请重新登录!'
@@ -488,7 +538,7 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name:'login'})
+        this.$router.push({name: 'login'})
       }
     },
     created() {
