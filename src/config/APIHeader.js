@@ -87,6 +87,7 @@ class API {
   static put(uri,params,headers){
     config.params = {};
     var data=qs.stringify(params);
+
     if (!headers) {
       config.headers['Content-Type'] =  'application/x-www-form-urlencoded;charset=utf-8';
     } else {

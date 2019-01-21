@@ -164,7 +164,8 @@
           <quill-editor ref="myTextEditor"
                         v-model="addObject.content"
                         :options="editorOption"
-                        @change="onAddChange($event)">
+                        @change="onAddChange($event)"
+                        style="height: 500px">
           </quill-editor>
         </div>
       </div>
@@ -243,7 +244,8 @@
             <quill-editor ref="myTextEditor"
                           v-model="editObject.content"
                           :options="editorOption"
-                          @change="onEditorChange($event)">
+                          @change="onEditorChange($event)"
+                          style="height: 500px">
             </quill-editor>
           </div>
         </div>
@@ -584,7 +586,7 @@
               params['pFrom'] = this.editObject.pFrom;
               params['systemId'] = storage.get('sysid');
               console.log(params)
-              API.put('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+              API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
                   this.getPage();
@@ -709,7 +711,7 @@
         params['top'] = this.top;
         params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.put('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()
@@ -730,7 +732,7 @@
         params['status'] = 1;
         params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.put('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()
@@ -751,7 +753,7 @@
         params['status'] = 0;
         params['systemId'] = storage.get('sysid');
         console.log(params)
-        API.put('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
           console.log(res.data)
           if (res.data.code == 200) {
             this.getPage()

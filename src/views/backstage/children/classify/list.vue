@@ -235,6 +235,7 @@
       },
       // 格式化创建时间
       gstime(val){
+        console.log(val)
         return val.iCreateTime.substr(0,10)
       },
       // 新增
@@ -344,7 +345,7 @@
             params['iPid'] = this.editObject.iPid;
             params['iType'] = this.editObject.iType;
             params['iSystemId'] = storage.get('sysid');
-            API.put('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+            API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
               console.log(res.data)
               if (res.data.code == 200) {
                 this.editPop = false;

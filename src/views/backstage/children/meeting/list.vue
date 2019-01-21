@@ -214,7 +214,8 @@
           <quill-editor ref="myTextEditor"
                         v-model="addObject.mContent"
                         :config="editorOption"
-                        @change="onAddChange($event)">
+                        @change="onAddChange($event)"
+                        style="height: 500px">
           </quill-editor>
         </div>
       </div>
@@ -358,7 +359,8 @@
           <quill-editor ref="myTextEditor"
                         v-model="editObject.mContent"
                         :config="editorOption"
-                        @change="onEditChange($event)">
+                        @change="onEditChange($event)"
+                        style="height: 500px">
           </quill-editor>
         </div>
       </div>
@@ -793,7 +795,7 @@
                 params['mSystemId'] = storage.get('sysid');
 
                 console.log(params)
-                API.put('/meeTing/update', params,{Authorization:storage.get('token')}).then((res) => {
+                API.post('/meeTing/update', params,{Authorization:storage.get('token')}).then((res) => {
                   console.log(res.data)
                   if (res.data.code == 200) {
                     this.editPop = false;

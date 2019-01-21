@@ -232,7 +232,7 @@
                         v-model="addObject.nContent"
                         :config="editorOption"
                         @change="onAddChange($event)"
-                        style="margin-left: 23px;">
+                        style="margin-left: 23px;height: 300px">
           </quill-editor>
         </div>
       </div>
@@ -309,7 +309,7 @@
                         v-model="editObject.nContent"
                         :config="editorOption"
                         @change="onEditorChange($event)"
-                        style="margin-left: 23px;">
+                        style="margin-left: 23px;height: 500px">
           </quill-editor>
         </div>
       </div>
@@ -693,7 +693,7 @@
               params['iId'] = this.editObject.iId;
               params['nSystemId'] = storage.get('sysid');
               console.log(params)
-              API.put('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+              API.post('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
                   this.getPage();

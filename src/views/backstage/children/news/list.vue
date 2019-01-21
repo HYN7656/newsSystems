@@ -153,7 +153,8 @@
           <quill-editor ref="myTextEditor"
                         v-model="addObject.fContent"
                         :options="editorOption"
-                        @change="onAddChange($event)">
+                        @change="onAddChange($event)"
+                        style="height: 500px">
           </quill-editor>
         </div>
       </div>
@@ -229,7 +230,8 @@
             <quill-editor ref="myTextEditor"
                           v-model="editObject.fContent"
                           :options="editorOption"
-                          @change="onEditorChange($event)">
+                          @change="onEditorChange($event)"
+                          style="height: 500px">
             </quill-editor>
         </div>
       </div>
@@ -576,7 +578,7 @@
               params['fFrom'] = this.editObject.fFrom;
               params['fSystemId'] = storage.get('sysid');
               console.log(params)
-              API.put('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+              API.post('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
                   this.getPage();

@@ -59,7 +59,10 @@
           API.get('/plan/FindById',params,{Authorization:storage.get('token')}).then((res)=>{
             console.log(res.data)
             if(res.data.code == 200) {
-              this.datail = res.data.data.data;
+              // this.datail = res.data.data.data;
+              var arr = Object.assign({}, res.data.data.data);
+              arr.releaseTime = arr.releaseTime.slice(0,19)
+              this.datail = arr;
               this.file = res.data.data.file;
               for(var i=0;i<this.file.length;i++){
                 this.file[i].url = config.baseURL + this.file[i].fenclUrl;

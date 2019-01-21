@@ -346,7 +346,7 @@
                 params['qId'] = this.editObject.powerList.join(',');
                 params['uSystemId'] = this.uSystemId;
                 console.log(params)
-                API.put('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
+                API.post('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
                   console.log(res.data)
                   if (res.data.code == 200) {
                     this.editPop = false;
@@ -379,7 +379,7 @@
                   params['qId'] = this.editObject.powerList.join(',');
                   params['uSystemId'] = this.uSystemId;
                   console.log(params)
-                  API.put('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
+                  API.post('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
                     console.log(res.data)
                     if (res.data.code == 200) {
                       this.editPop = false;
