@@ -249,6 +249,7 @@
                     type: 'error',
                     message: '新增失败!' + res.data.message
                   });
+                  this.loadingBtn = false;
                 }
               })
             }
@@ -330,7 +331,7 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            if (!this.editObject.powerList.length) {
+            if (!this.editObject.powerList || !this.editObject.powerList.length) {
               this.$message({
                 type: 'error',
                 message: '请选择权限!'
