@@ -215,7 +215,7 @@
         params['count'] = this.pageSize;
         API.get('/ification/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
-            console.log(res.data)
+            // console.log(res.data);
             var arr = res.data.data.ificationList;
             var arr2 = [];
             this.tableData = arr2.concat(arr);
@@ -223,20 +223,20 @@
             this.treeListP = res.data.data.treeList;
             for(var i=0;i<arr.length;i++){
               if(typeof arr[i] != 'object'){
-                this.total = arr[i]
+                this.total = arr[i];
               }
             }
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
       // 格式化创建时间
       gstime(val){
-        console.log(val)
-        return val.iCreateTime.substr(0,10)
+        // console.log(val);
+        return val.iCreateTime.substr(0,10);
       },
       // 新增
       addOpen() {
@@ -251,7 +251,7 @@
         if(this.$refs.addObject){
           this.$refs.addObject.clearValidate();
         }else {
-          return
+          return;
         }
       },
       ChoicePidAdd(){
@@ -278,9 +278,9 @@
             params['iPid'] = this.addObject.iPid;
             params['iType'] = this.addObject.iType;
             params['iSystemId'] = storage.get('sysid');
-            console.log(params)
+            // console.log(params);
             API.post('/ification/create', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
+              // console.log(res.data)
               if (res.data.code == 200) {
                 this.addPop = false;
                 this.getPage();
@@ -289,16 +289,16 @@
                   message: '新增成功!'
                 });
               } else if(res.data.code == 1001){
-                this.signOut()
+                this.signOut();
               } else {
                 this.$message({
                   type: 'error',
                   message: '新增失败!'
                 });
               }
-            })
+            });
           }
-        })
+        });
       },
       // 编辑
       editOpen(id) {
@@ -316,7 +316,7 @@
         let params = {};
         params['id'] = id;
         API.get('/ification/FindByid', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             if(res.data.data.classIfication.iPid == 0){
               this.editObject = res.data.data.classIfication;
@@ -327,9 +327,9 @@
               this.EdittypeShow = true;
             }
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -338,7 +338,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.loadingBtn = true;
-            console.log(this.editObject)
+            // console.log(this.editObject);
             let params = {};
             params['id'] = this.editObject.id;
             params['iName'] = this.editObject.iName;
@@ -346,7 +346,7 @@
             params['iType'] = this.editObject.iType;
             params['iSystemId'] = storage.get('sysid');
             API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-              console.log(res.data)
+              // console.log(res.data);
               if (res.data.code == 200) {
                 this.editPop = false;
                 this.getPage();
@@ -355,16 +355,16 @@
                   message: '编辑成功!'
                 });
               } else if(res.data.code == 1001){
-                this.signOut()
+                this.signOut();
               } else {
                 this.$message({
                   type: 'error',
                   message: '编辑失败!'
                 });
               }
-            })
+            });
           }
-        })
+        });
       },
       // 单个删除
       del(id) {
@@ -384,20 +384,20 @@
                 message: '删除成功!'
               });
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'+res.data.message
               });
             }
-          })
-        })
+          });
+        });
       },
       // 选择
       handleSelectionChange(val) {
         this.multipleSelection = val;
-        console.log(this.multipleSelection)
+        // console.log(this.multipleSelection);
       },
       // 选择删除
       selectDel() {
@@ -406,10 +406,10 @@
             type: 'info',
             message: '请选择需要删除的数据'
           });
-          return
+          return;
         }
         this.multipleSelection.forEach(ele => {
-          this.activeTableDataId.push(ele.id)
+          this.activeTableDataId.push(ele.id);
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -421,7 +421,7 @@
           params['id'] = this.activeTableDataId2;
           params['iSystemId'] = storage.get('sysid');
           API.delete('/ification/ificatDelete', params,{Authorization:storage.get('token')}).then((res) => {
-            console.log(res.data)
+            // console.log(res.data);
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -429,27 +429,27 @@
               });
               this.getPage();
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'+res.data.message
               });
             }
-          })
-        })
+          });
+        });
       },
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.getPage()
-        console.log(val);
+        this.getPage();
+        // console.log(val);
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
         this.pageSize = val;
-        this.getPage()
-        console.log(val);
+        this.getPage();
+        // console.log(val);
       },
       signOut(){
         this.$message({
@@ -461,7 +461,7 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name:'login'})
+        this.$router.push({name:'login'});
       }
     },
     created() {

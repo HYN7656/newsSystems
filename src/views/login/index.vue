@@ -49,7 +49,7 @@
 </template>
 
 <script>
-  import Utils from '@/utils/utils2.js'
+  import Utils from '@/utils/utils2.js';
   export default {
     data() {
       return {
@@ -68,18 +68,18 @@
         // storage.set('token', '3333333333333');
         if (!this.userNum) {
           this.$message('请填写用户名');
-          return
+          return;
         } else if (!this.userPassword) {
           this.$message('请输入密码');
-          return
+          return;
         } else {
           // this.$router.push({name: 'home'})
           let params = {};
           params['uName'] = this.userNum;
           params['uPasswd'] = Utils.encrypt(this.userPassword);
-          console.log(params)
+          // console.log(params);
           API.post('/ususer/login', params).then((res) => {
-            console.log(res.data)
+            // console.log(res.data);
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -90,14 +90,14 @@
               storage.set('token', res.data.data.token);
               storage.set('sysid', res.data.data.id);
               storage.setJson('auth', res.data.data.diction);
-              this.$router.push({name: 'home'})
+              this.$router.push({name: 'home'});
             } else {
               this.$message({
                 type: 'error',
                 message: '登录失败!'+ res.data.message
               });
             }
-          })
+          });
         }
       },
       /*showRegister() {

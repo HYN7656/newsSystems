@@ -261,8 +261,8 @@
 
 <script>
   import config from "@/config/config.js";
-  import {quillEditor} from 'vue-quill-editor'
-  import * as Quill from 'quill' //引入编辑器
+  import {quillEditor} from 'vue-quill-editor';
+  import * as Quill from 'quill'; //引入编辑器
   //quill编辑器的字体
   var fonts = ['SimSun', 'SimHei','Microsoft-YaHei','KaiTi','FangSong','Arial','Times-New-Roman','sans-serif'];
   var Font = Quill.import('formats/font');
@@ -370,7 +370,7 @@
         params['count'] = this.pageSize;
         API.get('/plan/findAll', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
-            console.log(res.data)
+            // console.log(res.data);
             this.tableData = res.data.data;
             this.total = res.data.count;
             for (var i = 0; i < this.tableData.length; i++) {
@@ -380,10 +380,10 @@
                 this.tableData[i].fbStatus = false;
               }
             }
-            console.log(this.tableData)
+            // console.log(this.tableData);
             //this.currentPage = 4
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             // console.log(res.data)
           }
@@ -393,32 +393,32 @@
         let params = {};
         params['type'] = 2;
         API.get('/ification/findByType', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data)
           if(res.data.code == 200){
             this.options = res.data.data;
           }else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           }
-          console.log(this.options)
+          // console.log(this.options);
         })
       },
       // 搜索
       search() {
-        console.log(this.SearchInp)
+        // console.log(this.SearchInp);
         let params = {};
         params['title'] = this.SearchInp;
         params['iId'] = this.SearchValue;
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
         API.get('/plan/findAll', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.tableData = res.data.data;
             this.total = res.data.count;
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -441,7 +441,7 @@
         if(this.$refs.addObject){
           this.$refs.addObject.clearValidate();
         }else {
-          return
+          return;
         }
       },
       // 新增保存
@@ -454,7 +454,7 @@
               // 上传数据
               var arr = [];
               var arr2 = [];
-              console.log(this.AddfileList)
+              // console.log(this.AddfileList);
               for (var i = 0; i < this.AddfileList.length; i++) {
                 if (this.AddfileList[i].response.code == '200') {
                   arr.push(this.AddfileList[i].response.data.revealImage);
@@ -473,9 +473,9 @@
               params['author'] = this.addObject.author;
               params['pFrom'] = this.addObject.pFrom;
               params['systemId'] = storage.get('sysid');
-              console.log(params)
+              // console.log(params);
               API.post('/plan/create', params,{Authorization:storage.get('token')}).then((res) => {
-                console.log(res.data)
+                // console.log(res.data)
                 if (res.data.code == 200) {
                   this.addPop = false;
                   this.getPage();
@@ -484,7 +484,7 @@
                     message: '新增成功!'
                   });
                 } else if(res.data.code == 1001){
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -493,12 +493,12 @@
                   this.loadingBtn = false;
                   this.num = 0;
                 }
-              })
+              });
             }else {
               return;
             }
           }
-        })
+        });
       },
       // 新增上传功能成功
       succAdd(response, file, fileList) {
@@ -530,7 +530,7 @@
         let params = {};
         params['id'] = id;
         API.get('/plan/FindById', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
             // this.editObject.furl = this.editObject.fImgUrl;
@@ -538,13 +538,13 @@
             this.EditfileList = res.data.data.file;
             var obj = [];
             for (var i = 0; i < res.data.data.file.length; i++) {
-              obj.push({url: res.data.data.file[i].fenclUrl, name: res.data.data.file[i].fenclName})
+              obj.push({url: res.data.data.file[i].fenclUrl, name: res.data.data.file[i].fenclName});
             }
             this.EditfileList = obj;
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -563,8 +563,8 @@
                   arr.push(this.EditfileList[i].response.data.revealImage);
                   arr2.push(this.EditfileList[i].response.data.imageName);
                 } else {
-                  arr.push(this.EditfileList[i].url)
-                  arr2.push(this.EditfileList[i].name)
+                  arr.push(this.EditfileList[i].url);
+                  arr2.push(this.EditfileList[i].name);
                 }
               }
               this.editObject.enclUrl = arr.join(',');
@@ -585,7 +585,7 @@
               params['author'] = this.editObject.author;
               params['pFrom'] = this.editObject.pFrom;
               params['systemId'] = storage.get('sysid');
-              console.log(params)
+              // console.log(params);
               API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
@@ -595,7 +595,7 @@
                     message: '编辑成功!'
                   });
                 } else if(res.data.code == 1001){
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -604,12 +604,12 @@
                   this.loadingBtn = false;
                   this.num = 0;
                 }
-              })
+              });
             }else {
               return;
             }
           }
-        })
+        });
       },
       // 编辑上传功能成功
       succEdit(response, file, fileList) {
@@ -625,7 +625,7 @@
       },
       // 上传文件地址
       uploadUrl(){
-        return config.baseURL + '/newsInfo/newsFiles'
+        return config.baseURL + '/newsInfo/newsFiles';
       },
       // 单个删除
       del(id) {
@@ -645,15 +645,15 @@
                 message: '删除成功!'
               });
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'
               });
             }
-          })
-        })
+          });
+        });
       },
       // 选择
       handleSelectionChange(val) {
@@ -666,10 +666,10 @@
             type: 'info',
             message: '请选择需要删除的数据'
           });
-          return
+          return;
         }
         this.multipleSelection.forEach(ele => {
-          this.activeTableDataId.push(ele.id)
+          this.activeTableDataId.push(ele.id);
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -681,7 +681,7 @@
           params['id'] = this.activeTableDataId2;
           params['systemId'] = storage.get('sysid');
           API.delete('/plan/delete', params,{Authorization:storage.get('token')}).then((res) => {
-            console.log(res.data)
+            // console.log(res.data);
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -689,15 +689,15 @@
               });
               this.getPage();
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'
               });
             }
-          })
-        })
+          });
+        });
       },
       // 置顶
       toggleTop(id, fTop) {
@@ -710,20 +710,20 @@
         params['id'] = id;
         params['top'] = this.top;
         params['systemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '置顶失败!'
             });
           }
-        })
+        });
       },
       //发布
       Release(id, fStatus) {
@@ -731,20 +731,20 @@
         params['id'] = id;
         params['status'] = 1;
         params['systemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '发布失败!'
             });
           }
-        })
+        });
       },
       // 取消发布
       ReleaseNo(id, fStatus) {
@@ -752,45 +752,45 @@
         params['id'] = id;
         params['status'] = 0;
         params['systemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/plan/newsUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '取消发布失败!'
             });
           }
-        })
+        });
       },
       // 查看
       linkDetail(id) {
-        this.$router.push({name: 'backstage.plan.detail', query: {id: id}})
+        this.$router.push({name: 'backstage.plan.detail', query: {id: id}});
       },
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.getPage()
-        console.log(val);
+        this.getPage();
+        // console.log(val);
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
         this.pageSize = val;
-        this.getPage()
-        console.log(val);
+        this.getPage();
+        // console.log(val);
       },
       // 编辑器
       onEditorChange({editor, html, text}) {
-        this.editObject.content = html
-        this.editObject.contents = text
+        this.editObject.content = html;
+        this.editObject.contents = text;
       },
       onAddChange({editor, html, text}) {
-        this.addObject.content = html
-        this.addObject.contents =text
+        this.addObject.content = html;
+        this.addObject.contents =text;
       },
       signOut(){
         this.$message({
@@ -802,7 +802,7 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name:'login'})
+        this.$router.push({name:'login'});
       }
     },
     created() {
@@ -812,7 +812,7 @@
     },
     mounted() {
       // you can use current editor object to do something(editor methods)
-      console.log('this is my editor', this.editor)
+      // console.log('this is my editor', this.editor)
       // this.editor to do something...
     }
 

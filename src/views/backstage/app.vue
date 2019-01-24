@@ -10,8 +10,8 @@
 </template>
 
 <script>
-  import BHeader from './../../components/bheader.vue'
-  import BFooter from './../../components/bfooter.vue'
+  import BHeader from './../../components/bheader.vue';
+  import BFooter from './../../components/bfooter.vue';
   export default {
     name: '',
     components:{ BHeader,BFooter },

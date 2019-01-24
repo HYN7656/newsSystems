@@ -463,8 +463,8 @@
         params['count'] = this.pageSize;
         API.get('/notice/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
-            console.log(res.data)
-            console.log(res.data)
+            // console.log(res.data);
+            // console.log(res.data);
             this.tableData = res.data.data;
             this.total = res.data.count;
             for (var i = 0; i < this.tableData.length; i++) {
@@ -475,32 +475,32 @@
               }
             }
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
       // 搜索
       search() {
-        console.log(this.SearchInp)
+        // console.log(this.SearchInp);
         let params = {};
         params['title'] = this.SearchInp;
         params['Iid'] = this.SearchValue;
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
-        console.log(params)
+        // console.log(params);
         API.get('/notice/FindBytitle', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.tableData = res.data.data;
             this.total = res.data.count;
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
-        })
+        });
       },
       //新增
       addOpen() {
@@ -523,7 +523,7 @@
         if(this.$refs.addObject){
           this.$refs.addObject.clearValidate();
         }else {
-          return
+          return;
         }
       },
       // 新增保存
@@ -559,9 +559,9 @@
               params['nEnclName'] = this.addObject.nEnclName;
               params['iId'] = this.addObject.iId;
               params['nSystemId'] = storage.get('sysid');
-              console.log(params)
+              // console.log(params);
               API.post('/notice/create', params,{Authorization:storage.get('token')}).then((res) => {
-                console.log(res.data)
+                // console.log(res.data);
                 if (res.data.code == 200) {
                   this.addPop = false;
                   this.getPage();
@@ -570,7 +570,7 @@
                     message: '新增成功!'
                   });
                 } else if(res.data.code == 1001){
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -579,12 +579,12 @@
                   this.loadingBtn = false;
                   this.num = 0;
                 }
-              })
+              });
             }else{
               return;
             }
           }
-        })
+        });
       },
       // 新增图片上传
       /*succImgAdd(response, file, fileList) {
@@ -629,7 +629,7 @@
         let params = {};
         params['id'] = id;
         API.get('/notice/FindById', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
             // this.editObject.nImgUrl = config.baseURL + res.data.data.data.nImgUrl;
@@ -639,13 +639,13 @@
             this.EditfileList = res.data.data.file;
             var obj = [];
             for (var i = 0; i < res.data.data.file.length; i++) {
-              obj.push({url: res.data.data.file[i].fenclUrl, name: res.data.data.file[i].fenclName})
+              obj.push({url: res.data.data.file[i].fenclUrl, name: res.data.data.file[i].fenclName});
             }
             this.EditfileList = obj;
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -664,8 +664,8 @@
                   arr.push(this.EditfileList[i].response.data.revealImage);
                   arr2.push(this.EditfileList[i].response.data.imageName);
                 } else {
-                  arr.push(this.EditfileList[i].url)
-                  arr2.push(this.EditfileList[i].name)
+                  arr.push(this.EditfileList[i].url);
+                  arr2.push(this.EditfileList[i].name);
                 }
               }
               this.editObject.nEnclUrl = arr.join(',');
@@ -692,7 +692,7 @@
               params['nEnclName'] = this.editObject.nEnclName;
               params['iId'] = this.editObject.iId;
               params['nSystemId'] = storage.get('sysid');
-              console.log(params)
+              // console.log(params);
               API.post('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
@@ -702,7 +702,7 @@
                     message: '编辑成功!'
                   });
                 } else if(res.data.code == 1001){
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -716,7 +716,7 @@
               return;
             }
           }
-        })
+        });
       },
       // 编辑图片上传
       /*succImgEdit(response, file, fileList) {
@@ -747,7 +747,7 @@
       },*/
       // 上传文件地址
       uploadUrl(){
-        return config.baseURL + '/newsInfo/newsFiles'
+        return config.baseURL + '/newsInfo/newsFiles';
       },
       // 单个删除
       del(id) {
@@ -767,15 +767,15 @@
                 message: '删除成功!'
               });
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'
               });
             }
-          })
-        })
+          });
+        });
       },
       // 选择
       handleSelectionChange(val) {
@@ -788,10 +788,10 @@
             type: 'info',
             message: '请选择需要删除的数据'
           });
-          return
+          return;
         }
         this.multipleSelection.forEach(ele => {
-          this.activeTableDataId.push(ele.id)
+          this.activeTableDataId.push(ele.id);
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -803,7 +803,7 @@
           params['id'] = this.activeTableDataId2;
           params['nSystemId'] = storage.get('sysid');
           API.delete('/notice/noticeDelete', params,{Authorization:storage.get('token')}).then((res) => {
-            console.log(res.data)
+            // console.log(res.data)
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -811,15 +811,15 @@
               });
               this.getPage();
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!'
               });
             }
-          })
-        })
+          });
+        });
       },
       // 置顶
       toggleTop(id, nTop) {
@@ -827,20 +827,20 @@
         params['id'] = id;
         params['nTop'] = nTop;
         params['nSystemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/notice/noticeupdatetop', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '置顶失败!'
             });
           }
-        })
+        });
       },
       //发布
       Release(id,nStatus) {
@@ -848,20 +848,20 @@
         params['id'] = id;
         params['nStatus'] = nStatus;
         params['nSystemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/notice/noticerelease', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '发布失败!'
             });
           }
-        })
+        });
       },
       // 取消发布
       ReleaseNo(id,nStatus) {
@@ -869,20 +869,20 @@
         params['id'] = id;
         params['nStatus'] = nStatus;
         params['nSystemId'] = storage.get('sysid');
-        console.log(params)
+        // console.log(params);
         API.post('/notice/noticerelease', params,{Authorization:storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
-            this.getPage()
+            this.getPage();
           } else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           } else {
             this.$message({
               type: 'error',
               message: '取消发布失败!'
             });
           }
-        })
+        });
       },
       //分类
       classify() {
@@ -892,9 +892,9 @@
           if(res.data.code == 200){
             this.options = res.data.data;
           }else if(res.data.code == 1001){
-            this.signOut()
+            this.signOut();
           }
-          console.log(this.options)
+          // console.log(this.options);
         })
       },
 
@@ -903,7 +903,7 @@
 
       // 短信提醒
       tip(id) {
-        this.tipPop = true
+        this.tipPop = true;
       },
       // 短信用户选择
       userBox() {
@@ -912,7 +912,7 @@
         for (var i = 0; i < this.userData.length; i++) {
           for (var j = 0; j < this.userList.length; j++) {
             if (this.userList[j] == this.userData[i].key) {
-              arr.push(this.userData[i].label)
+              arr.push(this.userData[i].label);
             }
           }
         }
@@ -921,7 +921,7 @@
       // 短信保存
       MesSave() {
         this.tipPop = false;
-        console.log(this.Msg)
+        // console.log(this.Msg);
       },
       // 短信模板
       modelbox() {
@@ -929,11 +929,11 @@
         let params = {};
         API.get('static/dxmb.json', params).then((res) => {
           if (res.status == 200) {
-            console.log(res.data)
+            // console.log(res.data);
             this.msgList = res.data;
             this.messAge = res.data[0].value;
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -944,31 +944,31 @@
       },
       // 进入详情
       linkDetail(id) {
-        this.$router.push({name: 'backstage.notice.detail', query: {id: id}})
+        this.$router.push({name: 'backstage.notice.detail', query: {id: id}});
       },
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
-        console.log(val);
+        // console.log(val);
         this.currentPage = val;
-        this.getPage()
+        this.getPage();
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
-        console.log(val);
+        // console.log(val);
         this.pageSize = val;
-        this.getPage()
+        this.getPage();
       },
       // 编辑器
       onEditorChange({editor, html, text}) {
-        console.log('editor change!', editor, html, text)
-        this.editObject.nContent = html
-        this.editObject.nContents = text
+        // console.log('editor change!', editor, html, text);
+        this.editObject.nContent = html;
+        this.editObject.nContents = text;
       },
       onAddChange({editor, html, text}) {
-        console.log('editor change!', editor, html, text)
+        // console.log('editor change!', editor, html, text);
 
-        this.addObject.nContent = html
-        this.addObject.nContents = text
+        this.addObject.nContent = html;
+        this.addObject.nContents = text;
       },
       signOut(){
         this.$message({
@@ -980,19 +980,19 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name:'login'})
+        this.$router.push({name:'login'});
       }
     },
     created() {
-      this.classify()
-      this.getPage()
+      this.classify();
+      this.getPage();
     },
     mounted() {
 
       // this.offHeight = hei;
       // console.log(this.offHeight)
       // you can use current editor object to do something(editor methods)
-      console.log('this is my editor', this.editor)
+      // console.log('this is my editor', this.editor);
       // this.editor to do something...
     },
   }

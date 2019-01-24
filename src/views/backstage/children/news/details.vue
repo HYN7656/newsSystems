@@ -57,21 +57,21 @@
           let params={};
           params['id'] = this.$route.query.id;
           API.get('/newsInfo/FindById',params,{Authorization:storage.get('token')}).then((res)=>{
-            console.log(res.data)
+            // console.log(res.data);
             if(res.data.code == 200) {
               // this.datail = res.data.data.data;
               var arr = Object.assign({}, res.data.data.data);
-              arr.fReleaseTime = arr.fReleaseTime.slice(0,19)
+              arr.fReleaseTime = arr.fReleaseTime.slice(0,19);
               this.datail = arr;
-              this.file = res.data.data.file
+              this.file = res.data.data.file;
               for(var i=0;i<this.file.length;i++){
                 this.file[i].url = config.baseURL + this.file[i].fenclUrl;
               }
             } else if(res.data.code == 1001){
-              this.signOut()
+              this.signOut();
             }
           })
-          console.log(this.$route.query.id)
+          // console.log(this.$route.query.id);
         },
         signOut(){
           this.$message({
@@ -83,7 +83,7 @@
           storage.delete('auth');
           storage.delete('token');
           storage.delete('sysid');
-          this.$router.push({name:'login'})
+          this.$router.push({name:'login'});
         }
       }
     }

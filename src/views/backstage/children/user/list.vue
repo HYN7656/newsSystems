@@ -167,22 +167,22 @@
         let params = {};
         API.get('/ususer/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
-            console.log(res.data)
+            // console.log(res.data);
             this.tableData = res.data.data;
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
         API.get('/juris/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.power = res.data.data;
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -191,13 +191,13 @@
         let params = {};
         params['name'] = this.SearchInp;
         API.get('/ususer/FindByName', params, {Authorization: storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.tableData = res.data.data;
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
         })
       },
@@ -214,7 +214,7 @@
         if (this.$refs.addObject) {
           this.$refs.addObject.clearValidate();
         } else {
-          return
+          return;
         }
       },
       // 新增保存
@@ -232,9 +232,9 @@
               params['uName'] = this.addObject.uName;
               params['qId'] = this.addObject.powerList;
               params['uSystemId'] = this.uSystemId;
-              console.log(params)
+              // console.log(params);
               API.post('/ususer/create', params, {Authorization: storage.get('token')}).then((res) => {
-                console.log(res.data)
+                // console.log(res.data)
                 if (res.data.code == 200) {
                   this.addPop = false;
                   this.getPage();
@@ -243,7 +243,7 @@
                     message: '新增成功!'
                   });
                 } else if (res.data.code == 1001) {
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -251,15 +251,15 @@
                   });
                   this.loadingBtn = false;
                 }
-              })
+              });
             }
           }
-        })
+        });
       },
       // 新增权限
       AddAllhandleChecked(val) {
-        var cityOptions = []
-        var cityOptionsKey = []
+        var cityOptions = [];
+        var cityOptionsKey = [];
         for (var i = 0; i < this.power.length; i++) {
           cityOptions.push(this.power[i].qName);
           cityOptionsKey.push(this.power[i].id);
@@ -269,17 +269,17 @@
         this.isIndeterminate = false;
       },
       AddhandleChecked(value) {
-        console.log(value)
-        this.addObject.powerList = []
+        // console.log(value);
+        this.addObject.powerList = [];
         var ctOption = value;
         for (var i = 0; i < ctOption.length; i++) {
           for (var j = 0; j < this.power.length; j++) {
             if (ctOption[i] == this.power[j].qName) {
-              this.addObject.powerList.push(this.power[j].id)
+              this.addObject.powerList.push(this.power[j].id);
             }
           }
         }
-        console.log(this.addObject.powerList)
+        // console.log(this.addObject.powerList);
         let checkedCount = value.length;
         this.checkAll = checkedCount === this.power.length;
         this.isIndeterminate = checkedCount > 0 && checkedCount < this.power.length;
@@ -302,7 +302,7 @@
         let params = {};
         params['id'] = id;
         API.get('/ususer/FindByid', params, {Authorization: storage.get('token')}).then((res) => {
-          console.log(res.data)
+          // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data;
             this.editObject.uName = res.data.data.uname;
@@ -318,14 +318,14 @@
                 }
               }
             }
-            console.log(this.EditcheckedCities)
-            console.log(this.editObject.powerList)
+            // console.log(this.EditcheckedCities);
+            // console.log(this.editObject.powerList);
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else {
-            console.log(res.data)
+            console.log(res.data);
           }
-        })
+        });
       },
       // 编辑保存
       editSave(formName) {
@@ -346,9 +346,9 @@
                 params['uName'] = this.editObject.uName;
                 params['qId'] = this.editObject.powerList.join(',');
                 params['uSystemId'] = this.uSystemId;
-                console.log(params)
+                // console.log(params);
                 API.post('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
-                  console.log(res.data)
+                  // console.log(res.data)
                   if (res.data.code == 200) {
                     this.editPop = false;
                     this.getPage();
@@ -357,19 +357,19 @@
                       message: '编辑成功!'
                     });
                   } else if (res.data.code == 1001) {
-                    this.signOut()
+                    this.signOut();
                   } else {
                     this.$message({
                       type: 'error',
                       message: '编辑失败!'
                     });
                   }
-                })
+                });
               }else {
-                var name = {}
+                var name = {};
               name['name'] = this.editObject.uName;
               API.get('/ususer/shiroByName', name, {Authorization: storage.get('token')}).then((res) => {
-                console.log(res.data)
+                // console.log(res.data);
                 if (res.data.code == 200) {
                   this.loadingBtn = true;
                   var params = {
@@ -379,9 +379,9 @@
                   params['uName'] = this.editObject.uName;
                   params['qId'] = this.editObject.powerList.join(',');
                   params['uSystemId'] = this.uSystemId;
-                  console.log(params)
+                  // console.log(params);
                   API.post('/ususer/update', params, {Authorization: storage.get('token')}).then((res) => {
-                    console.log(res.data)
+                    // console.log(res.data);
                     if (res.data.code == 200) {
                       this.editPop = false;
                       this.getPage();
@@ -390,54 +390,54 @@
                         message: '编辑成功!'
                       });
                     } else if (res.data.code == 1001) {
-                      this.signOut()
+                      this.signOut();
                     } else {
                       this.$message({
                         type: 'error',
                         message: '编辑失败!'
                       });
                     }
-                  })
+                  });
                 } else if (res.data.code == 1001) {
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
                     message: '编辑失败!' + res.data.message
                   });
                 }
-              })
+              });
               }
             }
           }
-        })
+        });
       },
 
       // 编辑权限
       EditAllhandleChecked(val) {
-        var cityOptions = []
-        var cityOptionsKey = []
+        var cityOptions = [];
+        var cityOptionsKey = [];
         for (var i = 0; i < this.power.length; i++) {
           cityOptions.push(this.power[i].qName);
           cityOptionsKey.push(this.power[i].id);
         }
         this.EditcheckedCities = val ? cityOptions : [];
         this.editObject.powerList = val ? cityOptionsKey : [];
-        console.log(this.editObject.powerList)
+        // console.log(this.editObject.powerList);
         this.EditisIndeterminate = false;
       },
       EdithandleChecked(value) {
-        console.log(value)
-        this.editObject.powerList = []
+        // console.log(value);
+        this.editObject.powerList = [];
         var ctOption = value;
         for (var i = 0; i < ctOption.length; i++) {
           for (var j = 0; j < this.power.length; j++) {
             if (ctOption[i] == this.power[j].qName) {
-              this.editObject.powerList.push(this.power[j].id)
+              this.editObject.powerList.push(this.power[j].id);
             }
           }
         }
-        console.log(this.editObject.powerList)
+        // console.log(this.editObject.powerList);
         let checkedCount = value.length;
         this.EditcheckAll = checkedCount === this.power.length;
         this.EditisIndeterminate = checkedCount > 0 && checkedCount < this.power.length;
@@ -445,7 +445,7 @@
       // 选择
       handleSelectionChange(val) {
         this.multipleSelection = val;
-        console.log(this.multipleSelection)
+        // console.log(this.multipleSelection);
       },
       // 选择删除
       selectDel() {
@@ -457,7 +457,7 @@
           return
         }
         this.multipleSelection.forEach(ele => {
-          this.activeTableDataId.push(ele.id)
+          this.activeTableDataId.push(ele.id);
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -469,7 +469,7 @@
           params['id'] = this.activeTableDataId2;
           params['uSystemId'] = storage.get('sysid');
           API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
-            console.log(res.data)
+            // console.log(res.data);
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -477,15 +477,15 @@
               });
               this.getPage();
             } else if (res.data.code == 1001) {
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!' + res.data.message
               });
             }
-          })
-        })
+          });
+        });
       },
       // 单个删除
       del(id) {
@@ -498,7 +498,7 @@
           params['id'] = id;
           params['uSystemId'] = storage.get('sysid');
           API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
-            console.log(res.data)
+            // console.log(res.data);
             if (res.data.code == 200) {
               this.getPage();
               this.$message({
@@ -506,14 +506,14 @@
                 message: '删除成功!'
               });
             } else if (res.data.code == 1001) {
-              this.signOut()
+              this.signOut();
             } else {
               this.$message({
                 type: 'error',
                 message: '删除失败!' + res.data.message
               });
             }
-          })
+          });
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -539,7 +539,7 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name: 'login'})
+        this.$router.push({name: 'login'});
       }
     },
     created() {
@@ -547,7 +547,7 @@
     },
     mounted() {
       // you can use current editor object to do something(editor methods)
-      console.log('this is my editor', this.editor)
+      // console.log('this is my editor', this.editor);
       // this.editor to do something...
     }
   }
