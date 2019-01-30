@@ -342,7 +342,8 @@
         tableData: [],
         num : 0,
         ImgUrl:'',
-        searchNum:0
+        searchNum:0,
+        EditName:''
       }
     },
     computed: {},
@@ -464,7 +465,7 @@
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '新增失败!'
+                    message: '新增失败!'+ res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
@@ -507,6 +508,7 @@
         this.loadingBtn = false;
         this.num = 0;
         this.EditfileList = [];
+        this.EditName = '';
         this.editObject = {
           fTitle: '',
           fContent: '',
@@ -523,10 +525,11 @@
         API.get('/newsInfo/FindById', params,{Authorization:storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
-            this.editObject = res.data.data.data;
-            this.editObject.fImgUrl = config.baseURL + res.data.data.data.fImgUrl;
+            var arr = Object.assign({},  res.data.data.data);
             this.ImgUrl = res.data.data.data.fImgUrl;
-            // console.log(this.editObject.fImgUrl);
+            this.editObject = arr;
+            this.EditName = arr.fTitle;
+            this.editObject.fImgUrl = config.baseURL + arr.fImgUrl;
             this.editObject.furl = this.editObject.fImgUrl;
             // 上传列表
             this.EditfileList = res.data.data.file;
@@ -546,8 +549,9 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.num ++;
-            if(this.num == 1) {
+            if(this.EditName == this.editObject.fTitle){
+              this.num ++;
+              if(this.num == 1) {
               this.loadingBtn = true;
               // 上传部分
               var arr = [];
@@ -576,18 +580,13 @@
               params['fTitle'] = this.editObject.fTitle;
               params['fContent'] = this.editObject.fContent;
               params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
-              /*if (this.editObject.furl.indexOf('http://') != -1) {
-                params['fImgUrl'] = this.editObject.furl.slice(parseInt(find(this.editObject.furl, '/', 3)));
-              } else {
-                params['fImgUrl'] = this.editObject.furl;
-              }*/
               params['fImgUrl'] = this.ImgUrl;
               params['fEnclUrl'] = this.editObject.fEnclUrl;
               params['fEnclName'] = this.editObject.fEnclName;
               params['fAuthor'] = this.editObject.fAuthor;
               params['fFrom'] = this.editObject.fFrom;
               params['fSystemId'] = storage.get('sysid');
-              console.log(params)
+              // console.log(params)
               API.post('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
@@ -601,7 +600,7 @@
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '编辑失败!'
+                    message: '编辑失败!'+ res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
@@ -609,6 +608,83 @@
               })
             }else {
               return;
+            }
+            }else{
+              let tit = {};
+              tit['title'] = this.editObject.fTitle;
+              API.get('/newsInfo/findByName', tit, {Authorization: storage.get('token')}).then((res) => {
+                if (res.data.code == 200) {
+                  this.num ++;
+                  if(this.num == 1) {
+                    this.loadingBtn = true;
+                    // 上传部分
+                    var arr = [];
+                    var arr2 = [];
+                    for (var i = 0; i < this.EditfileList.length; i++) {
+                      if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                        arr.push(this.EditfileList[i].response.data.revealImage);
+                        arr2.push(this.EditfileList[i].response.data.imageName);
+                      } else {
+                        arr.push(this.EditfileList[i].url);
+                        arr2.push(this.EditfileList[i].name);
+                      }
+                    }
+                    this.editObject.fEnclUrl = arr.join(',');
+                    this.editObject.fEnclName = arr2.join(',');
+                    function find(str, cha, num) {
+                      var x = str.indexOf(cha);
+                      for (var i = 0; i < num - 1; i++) {
+                        x = str.indexOf(cha, x + 1);
+                      }
+                      return x;
+                    }
+
+                    let params = {};
+                    params['id'] = this.editObject.id;
+                    params['fTitle'] = this.editObject.fTitle;
+                    params['fContent'] = this.editObject.fContent;
+                    params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
+                    params['fImgUrl'] = this.ImgUrl;
+                    params['fEnclUrl'] = this.editObject.fEnclUrl;
+                    params['fEnclName'] = this.editObject.fEnclName;
+                    params['fAuthor'] = this.editObject.fAuthor;
+                    params['fFrom'] = this.editObject.fFrom;
+                    params['fSystemId'] = storage.get('sysid');
+                    // console.log(params)
+                    API.post('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getPage();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if (res.data.code == 1001) {
+                        this.signOut();
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!'+ res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    })
+                  }else {
+                    return;
+                  }
+
+                } else if (res.data.code == 1001) {
+                  this.signOut();
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!'+ res.data.message
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                }
+              })
             }
           }
         })
@@ -620,7 +696,7 @@
         if (regex.test(fileName.toLowerCase())) {
           this.editObject.furl = response.data.revealImage;
           this.ImgUrl = response.data.revealImage;
-          console.log(this.editObject.furl)
+          // console.log(this.editObject.furl)
           this.editObject.fImgUrl = URL.createObjectURL(file.raw);
         } else {
           this.$message.error('请选择图片文件');
@@ -668,7 +744,7 @@
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'
+                message: '删除失败!'+ res.data.message
               });
             }
           });
@@ -734,7 +810,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '置顶失败!'
+              message: '置顶失败!'+ res.data.message
             });
           }
         });
@@ -755,7 +831,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '发布失败!'
+              message: '发布失败!'+ res.data.message
             });
           }
         });
@@ -776,7 +852,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '取消发布失败!'
+              message: '取消发布失败!'+ res.data.message
             });
           }
         });

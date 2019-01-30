@@ -293,7 +293,7 @@
               } else {
                 this.$message({
                   type: 'error',
-                  message: '新增失败!'
+                  message: '新增失败!'+ res.data.message
                 });
               }
             });
@@ -359,7 +359,7 @@
               } else {
                 this.$message({
                   type: 'error',
-                  message: '编辑失败!'
+                  message: '编辑失败!'+ res.data.message
                 });
               }
             });

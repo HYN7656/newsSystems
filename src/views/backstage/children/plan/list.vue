@@ -495,7 +495,7 @@
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '新增失败!'
+                    message: '新增失败!'+ res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
@@ -606,7 +606,7 @@
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '编辑失败!'
+                    message: '编辑失败!'+ res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
@@ -656,7 +656,7 @@
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'
+                message: '删除失败!'+ res.data.message
               });
             }
           });
@@ -700,7 +700,7 @@
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'
+                message: '删除失败!'+ res.data.message
               });
             }
           });
@@ -727,7 +727,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '置顶失败!'
+              message: '置顶失败!'+ res.data.message
             });
           }
         });
@@ -748,7 +748,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '发布失败!'
+              message: '发布失败!'+ res.data.message
             });
           }
         });
@@ -769,7 +769,7 @@
           } else {
             this.$message({
               type: 'error',
-              message: '取消发布失败!'
+              message: '取消发布失败!'+ res.data.message
             });
           }
         });
