@@ -5,7 +5,7 @@
         <el-input v-model="SearchInp" placeholder="请输入关键词汇" class="input-search"></el-input>
         <i class="el-icon-search icon"></i>
       </div>
-      <div class="btn-cell" @click="search">搜索</div>
+      <div class="btn-cell" @click="goReset">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
     </div>
@@ -87,7 +87,7 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加新闻" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加新闻" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -165,7 +165,7 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -280,7 +280,7 @@
           ],
           fAuthor: [
             { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 20 个字符', trigger: 'blur' }
+            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
           ],
 
         },
@@ -340,7 +340,9 @@
           theme:'snow'
         },
         tableData: [],
-        num : 0
+        num : 0,
+        ImgUrl:'',
+        searchNum:0
       }
     },
     computed: {},
@@ -389,6 +391,12 @@
             console.log(res.data);
           }
         })
+      },
+      goReset(){
+        this.currentPage = 1;
+        this.pageSize = 10;
+        this.searchNum = 1;
+        this.search();
       },
       // 新增
       addOpen() {
@@ -517,6 +525,7 @@
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
             this.editObject.fImgUrl = config.baseURL + res.data.data.data.fImgUrl;
+            this.ImgUrl = res.data.data.data.fImgUrl;
             // console.log(this.editObject.fImgUrl);
             this.editObject.furl = this.editObject.fImgUrl;
             // 上传列表
@@ -567,17 +576,18 @@
               params['fTitle'] = this.editObject.fTitle;
               params['fContent'] = this.editObject.fContent;
               params['fContents'] = this.editObject.fContents.replace(/[\r\n]/g, "");
-              if (this.editObject.furl.indexOf('http://') != -1) {
+              /*if (this.editObject.furl.indexOf('http://') != -1) {
                 params['fImgUrl'] = this.editObject.furl.slice(parseInt(find(this.editObject.furl, '/', 3)));
               } else {
                 params['fImgUrl'] = this.editObject.furl;
-              }
+              }*/
+              params['fImgUrl'] = this.ImgUrl;
               params['fEnclUrl'] = this.editObject.fEnclUrl;
               params['fEnclName'] = this.editObject.fEnclName;
               params['fAuthor'] = this.editObject.fAuthor;
               params['fFrom'] = this.editObject.fFrom;
               params['fSystemId'] = storage.get('sysid');
-              // console.log(params)
+              console.log(params)
               API.post('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
@@ -609,6 +619,8 @@
         let regex = /(.jpg|.jpeg|.gif|.png|.bmp)$/;
         if (regex.test(fileName.toLowerCase())) {
           this.editObject.furl = response.data.revealImage;
+          this.ImgUrl = response.data.revealImage;
+          console.log(this.editObject.furl)
           this.editObject.fImgUrl = URL.createObjectURL(file.raw);
         } else {
           this.$message.error('请选择图片文件');
@@ -776,13 +788,22 @@
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
+
         // console.log(val);
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
         this.pageSize = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
         // console.log(val);
       },
       // 编辑器

@@ -59,7 +59,7 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加分类" :visible.sync="addPop" class="tip-dialog small-dia" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加分类" :visible.sync="addPop" class="tip-dialog small-dia" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="100px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -100,7 +100,7 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog small-dia" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog small-dia" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="100px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">

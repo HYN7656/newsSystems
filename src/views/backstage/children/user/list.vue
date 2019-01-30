@@ -52,7 +52,7 @@
       </el-table>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
         <div class="content">
           <div class="cell">
@@ -80,7 +80,7 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog v-bind:title="title" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog v-bind:title="title" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
         <div class="content">
           <div class="cell">
@@ -513,7 +513,7 @@
                 message: '删除失败!' + res.data.message
               });
             }
-          });
+          })
         }).catch(() => {
           this.$message({
             type: 'info',

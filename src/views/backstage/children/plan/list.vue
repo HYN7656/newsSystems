@@ -6,7 +6,7 @@
         <i class="el-icon-search icon"></i>
       </div>
       <div class="select-table">
-        <el-select v-model="SearchValue" placeholder="请选择">
+        <el-select v-model="SearchValue" placeholder="请选择" clearable>
           <el-option
             v-for="item in options"
             :key="item.id"
@@ -15,7 +15,7 @@
           </el-option>
         </el-select>
       </div>
-      <div class="btn-cell" @click="search">搜索</div>
+      <div class="btn-cell" @click="goReset">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
     </div>
@@ -97,7 +97,7 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
     <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
       <div class="content">
         <el-row>
@@ -177,7 +177,7 @@
   </el-dialog>
 
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
         <div class="content">
           <el-row>
@@ -357,7 +357,8 @@
         },
         tableData: [],
         top : 0,
-        num:0
+        num:0,
+        searchNum:0
       }
     },
     computed: {},
@@ -421,6 +422,12 @@
             console.log(res.data);
           }
         })
+      },
+      goReset(){
+        this.currentPage = 1;
+        this.pageSize = 10;
+        this.searchNum = 1;
+        this.search();
       },
       // 新增
       addOpen() {
@@ -774,13 +781,21 @@
       // 翻页器：当前页，同时上一页下一页也能获取当前页
       handleCurrentChange(val) {
         this.currentPage = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
         // console.log(val);
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
         this.pageSize = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
         // console.log(val);
       },
       // 编辑器

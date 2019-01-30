@@ -61,7 +61,11 @@
             if(res.data.code == 200) {
               // this.datail = res.data.data.data;
               var arr = Object.assign({}, res.data.data.data);
-              arr.releaseTime = arr.releaseTime.slice(0,19)
+              if(arr.releaseTime){
+                arr.releaseTime = arr.releaseTime.slice(0,19);
+              }else {
+                arr.releaseTime = '';
+              }
               this.datail = arr;
               this.file = res.data.data.file;
               for(var i=0;i<this.file.length;i++){

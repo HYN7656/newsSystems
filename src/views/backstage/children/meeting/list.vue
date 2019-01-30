@@ -5,7 +5,7 @@
         <el-input v-model="SearchInp" placeholder="请输入关键词汇" class="input-search"></el-input>
         <i class="el-icon-search icon"></i>
       </div>
-      <div class="btn-cell" @click="search">搜索</div>
+      <div class="btn-cell" @click="goReset">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
     </div>
@@ -77,7 +77,7 @@
       </el-pagination>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加会议" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加会议" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="120px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -226,7 +226,7 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="120px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
@@ -544,7 +544,8 @@
             }
           }]
         },
-        num:0
+        num:0,
+        searchNum:0
 
       }
     },
@@ -579,6 +580,8 @@
         // console.log(this.SearchInp);
         let params = {};
         params['name'] = this.SearchInp;
+        params['page'] = this.currentPage;
+        params['count'] = this.pageSize;
         API.get('/meeTing/FindByName', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
             // console.log(res.data);
@@ -589,6 +592,12 @@
             console.log(res.data);
           }
         })
+      },
+      goReset(){
+        this.currentPage = 1;
+        this.pageSize = 10;
+        this.searchNum = 1;
+        this.search();
       },
       // 新增
       addOpen() {
@@ -1097,13 +1106,21 @@
       handleCurrentChange(val) {
         // console.log(val);
         this.currentPage = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
       },
       // 翻页器：选择10条还是20条、
       handleSizeChange(val) {
         // console.log(val);
         this.pageSize = val;
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
       },
       // 进入详情
       linkDetail(id) {
