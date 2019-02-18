@@ -107,8 +107,10 @@
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
-              <span class="name">来源：</span>
+              <!--<span class="name">来源：</span>-->
+              <el-form-item label="来源：" prop="fFrom">
               <el-input v-model="addObject.fFrom" placeholder="请输入内容" class="flew-input"></el-input>
+              </el-form-item>
             </div>
           </el-col>
         </el-row>
@@ -138,6 +140,7 @@
                 :auto-upload="true"
                 :multiple="true"
                 :limit="5"
+                :before-upload="beforeUpload"
                 :on-exceed="handleExceed"
                 :on-success="succAdd"
                 :on-remove="remAdd"
@@ -185,8 +188,10 @@
           </el-col>
           <el-col :span="11" :offset="2">
             <div class="cell">
-              <span class="name">来源：</span>
+              <el-form-item label="来源：" prop="fFrom">
+              <!--<span class="name">来源：</span>-->
               <el-input v-model="editObject.fFrom" placeholder="请输入内容" class="flew-input"></el-input>
+              </el-form-item>
             </div>
           </el-col>
         </el-row>
@@ -215,6 +220,7 @@
                 :file-list="EditfileList"
                 :multiple="true"
                 :limit="5"
+                :before-upload="beforeUpload"
                 :on-exceed="handleExceed"
                 :on-success="succEdit"
                 :on-remove="remEdit"
@@ -280,6 +286,9 @@
           ],
           fAuthor: [
             { required: true, message: '必填', trigger: 'blur' },
+            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
+          ],
+          fFrom : [
             { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
           ],
 
@@ -499,6 +508,17 @@
       remAdd(file, fileList) {
         this.AddfileList = fileList;
       },
+      // 上传大小限制
+      beforeUpload(file) {
+        const isLt2M = file.size / 1024 / 1024 < 100     //这里做文件大小限制
+        if (!isLt2M) {
+          this.$message({
+            message: '上传文件大小不能超过 100MB!',
+            type: 'warning'
+          });
+        }
+        return isLt2M
+      },
       // 编辑
       editOpen(id) {
         if(this.$refs.editObject){
@@ -586,7 +606,7 @@
               params['fAuthor'] = this.editObject.fAuthor;
               params['fFrom'] = this.editObject.fFrom;
               params['fSystemId'] = storage.get('sysid');
-              // console.log(params)
+              console.log(params)
               API.post('/newsInfo/newsUpdate', params, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
@@ -756,6 +776,7 @@
       },
       // 选择删除
       selectDel() {
+        this.activeTableDataId = [];
         if (this.multipleSelection.length == 0) {
           this.$message({
             type: 'info',

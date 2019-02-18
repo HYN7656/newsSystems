@@ -77,7 +77,7 @@
           let params = {};
           params['uName'] = this.userNum;
           params['uPasswd'] = Utils.encrypt(this.userPassword);
-          // console.log(params);
+          console.log(params);
           API.post('/ususer/login', params).then((res) => {
             // console.log(res.data);
             if (res.data.code == 200) {

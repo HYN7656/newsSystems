@@ -173,7 +173,7 @@
         rules: {
           iName: [
             { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+            { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
           ]
         },
         treeListP:[],
@@ -368,7 +368,7 @@
       },
       // 单个删除
       del(id) {
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        this.$confirm('删除后分类下的内容以后将无法查看, 请确认是否一定要删除?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -401,6 +401,7 @@
       },
       // 选择删除
       selectDel() {
+        this.activeTableDataId = [];
         if (this.multipleSelection.length == 0) {
           this.$message({
             type: 'info',
@@ -412,7 +413,7 @@
           this.activeTableDataId.push(ele.id);
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
-        this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
+        this.$confirm('删除后分类下的内容以后将无法查看, 您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

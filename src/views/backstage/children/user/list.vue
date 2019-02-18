@@ -5,7 +5,7 @@
         <el-input v-model="SearchInp" placeholder="请输入关键词汇" class="input-search"></el-input>
         <i class="el-icon-search icon"></i>
       </div>
-      <div class="btn-cell" @click="search">搜索</div>
+      <div class="btn-cell" @click="goReset">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
     </div>
@@ -46,10 +46,21 @@
           <template slot-scope="scope">
             <el-button type="text" size="small" class="look" @click="linkDetail(scope.row.id)">查看</el-button>
             <el-button type="text" size="small" class="edit" @click="editOpen(scope.row.id)">编辑</el-button>
-            <el-button type="text" size="small" class="del" @click="del(scope.row.id)">删除</el-button>
+            <el-button type="text" size="small" class="del" @click="del(scope.row.id,scope.row.uName)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
+    </div>
+    <div class="pagination-table">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[10, 50, 100]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </div>
     <!--添加弹框-->
     <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
@@ -58,7 +69,7 @@
           <div class="cell">
             <el-form-item label="用户名：" prop="uName">
               <!--<span class="name">用户名：</span>-->
-              <el-input v-model="addObject.uName" placeholder="请输入内容" class="flew-input"></el-input>
+              <el-input v-model="addObject.uName" placeholder="请输入用户名" class="flew-input"></el-input>
             </el-form-item>
           </div>
           <div class="cell qx">
@@ -87,7 +98,7 @@
             <el-form-item label="用户名：" prop="uName">
               <!--<span class="name">用户名：</span>-->
               <el-input v-model="editObject.uName" placeholder="请输入内容" class="flew-input"
-                        v-bind:disabled="look"></el-input>
+                        :disabled="true"></el-input>
             </el-form-item>
           </div>
           <div class="cell qx">
@@ -117,6 +128,16 @@
   export default {
     name: '',
     data() {
+      var validatePass = (rule, value, callback) => {
+        const reg = /^[0-9a-zA-Z]*$/g;
+        if (value === '') {
+          callback(new Error('请输入用户名'));
+        } else if(reg.test(value)){
+          callback();
+        } else {
+          return callback(new Error('用户名只能为字母、数字或组合'));
+        }
+      };
       return {
         loadingBtn:false,
         loading: false,
@@ -124,20 +145,24 @@
         addPop: false,
         checkAll: false,
         look: false,
-        uSystemId: 1,
+        currentPage: 1,
+        pageSize: 10,
+        total: 0,
+        uSystemId: storage.get('sysid'),
         title: "编辑",
         // 搜索初始化
         SearchInp: '',
         // 删除选择初始化
         multipleSelection: [],
         activeTableDataId: [],
+        activeTableDataName:[],
         activeTableDataId2: '',
         tableData: [],
         // 权限项
         power: [],
         // 权限打开页面被选中的
         checkedCities: [],
-        isIndeterminate: true,
+        isIndeterminate: false,
         checkAll: false,
         // 编辑权限打开页面被选中的
         EditcheckedCities: [],
@@ -155,20 +180,24 @@
         },
         rules: {
           uName: [
-            {required: true, message: '必填', trigger: 'blur'},
-            {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
+            {validator: validatePass, trigger: 'blur'},
+            {min:6 , max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur'}
           ]
         },
+        searchNum:0
       }
     },
     methods: {
       // 页面初始化
       getPage() {
         let params = {};
+        params['page'] = this.currentPage;
+        params['count'] = this.pageSize;
         API.get('/ususer/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
             // console.log(res.data);
             this.tableData = res.data.data;
+            this.total = res.data.count;
           } else if (res.data.code == 1001) {
             this.signOut();
           } else {
@@ -190,10 +219,13 @@
       search() {
         let params = {};
         params['name'] = this.SearchInp;
+        params['page'] = this.currentPage;
+        params['count'] = this.pageSize;
         API.get('/ususer/FindByName', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.tableData = res.data.data;
+            this.total = res.data.count;
           } else if (res.data.code == 1001) {
             this.signOut();
           } else {
@@ -201,12 +233,18 @@
           }
         })
       },
-
+      goReset(){
+        this.currentPage = 1;
+        this.pageSize = 10;
+        this.searchNum = 1;
+        this.search();
+      },
       // 新增
       addOpen() {
         this.checkedCities = [];
         this.addPop = true;
         this.loadingBtn = false;
+        this.isIndeterminate = true;
         this.addObject = {
           uName: '',
           powerList: []
@@ -354,7 +392,7 @@
                     this.getPage();
                     this.$message({
                       type: 'success',
-                      message: '编辑成功!'
+                      message: '编辑成功!'+"重新登录才可生效"
                     });
                   } else if (res.data.code == 1001) {
                     this.signOut();
@@ -449,6 +487,9 @@
       },
       // 选择删除
       selectDel() {
+        this.activeTableDataId = [];
+        this.activeTableDataName = [];
+        var num = 0;
         if (this.multipleSelection.length == 0) {
           this.$message({
             type: 'info',
@@ -458,6 +499,7 @@
         }
         this.multipleSelection.forEach(ele => {
           this.activeTableDataId.push(ele.id);
+          this.activeTableDataName.push(ele.uName)
         })
         this.activeTableDataId2 = this.activeTableDataId.join(',');
         this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
@@ -465,61 +507,101 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let params = {};
-          params['id'] = this.activeTableDataId2;
-          params['uSystemId'] = storage.get('sysid');
-          API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
-            // console.log(res.data);
-            if (res.data.code == 200) {
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-              this.getPage();
-            } else if (res.data.code == 1001) {
-              this.signOut();
-            } else {
-              this.$message({
-                type: 'error',
-                message: '删除失败!' + res.data.message
-              });
+          for(var i=0;i<this.activeTableDataName.length;i++){
+            if(this.activeTableDataName[i]=='admin'){
+              num++;
             }
-          });
+          }
+          if(num>0){
+            this.$message({
+              type: 'error',
+              message: '管理员不可删除!'
+            });
+            return;
+          }else{
+            let params = {};
+            params['id'] = this.activeTableDataId2;
+            params['uSystemId'] = storage.get('sysid');
+            API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
+              // console.log(res.data);
+              if (res.data.code == 200) {
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                });
+                this.getPage();
+              } else if (res.data.code == 1001) {
+                this.signOut();
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '删除失败!' + res.data.message
+                });
+              }
+            });
+          }
         });
       },
       // 单个删除
-      del(id) {
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let params = {};
-          params['id'] = id;
-          params['uSystemId'] = storage.get('sysid');
-          API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
-            // console.log(res.data);
-            if (res.data.code == 200) {
-              this.getPage();
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-            } else if (res.data.code == 1001) {
-              this.signOut();
-            } else {
-              this.$message({
-                type: 'error',
-                message: '删除失败!' + res.data.message
-              });
-            }
-          })
-        }).catch(() => {
+      del(id,name) {
+        if(name == "admin"){
           this.$message({
-            type: 'info',
-            message: '已取消删除'
+            type: 'error',
+            message: '管理员不可删除!'
           });
-        });
+        }else {
+          this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            let params = {};
+            params['id'] = id;
+            params['uSystemId'] = storage.get('sysid');
+            API.delete('/ususer/delete', params, {Authorization: storage.get('token')}).then((res) => {
+              // console.log(res.data);
+              if (res.data.code == 200) {
+                this.getPage();
+                this.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                });
+              } else if (res.data.code == 1001) {
+                this.signOut();
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '删除失败!' + res.data.message
+                });
+              }
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消删除'
+            });
+          });
+        }
+      },
+      // 翻页器：当前页，同时上一页下一页也能获取当前页
+      handleCurrentChange(val) {
+        this.currentPage = val;
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
+        // console.log(val);
+      },
+      // 翻页器：选择10条还是20条、
+      handleSizeChange(val) {
+        this.pageSize = val;
+        if(this.searchNum == '1'){
+          this.search();
+        }else {
+          this.getPage();
+        }
+        // console.log(val);
       },
       // 进入详情
       linkDetail(id) {

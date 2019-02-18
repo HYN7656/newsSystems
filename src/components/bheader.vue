@@ -97,13 +97,13 @@
         <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="80px"
                  class="demo-ruleForm">
           <el-form-item label="原始密码" prop="passOld">
-            <el-input type="password" v-model="ruleForm2.passOld" autocomplete="off"></el-input>
+            <el-input type="password" v-model="ruleForm2.passOld" autocomplete="off"  placeholder="请输入原始密码"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="pass">
-            <el-input type="password" v-model="ruleForm2.pass" autocomplete="off"></el-input>
+          <el-form-item label="密码" prop="pass" >
+            <el-input type="password" v-model="ruleForm2.pass" autocomplete="off" placeholder="请输入6-18位数字或字母" ></el-input>
           </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="ruleForm2.checkPass" autocomplete="off"></el-input>
+          <el-form-item label="确认密码" prop="checkPass" >
+            <el-input type="password" v-model="ruleForm2.checkPass" autocomplete="off" placeholder="请再次输入密码"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -121,13 +121,13 @@
     name: 'PHeader',
     data() {
       var validatePass = (rule, value, callback) => {
+        const reg = /^[0-9a-zA-Z]*$/g;
         if (value === '') {
           callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm2.checkPass !== '') {
-            this.$refs.ruleForm2.validateField('checkPass');
-          }
+        } else if(reg.test(value)){
           callback();
+        } else {
+          return callback(new Error('密码只能为字母和数字'));
         }
       };
       var validatePass2 = (rule, value, callback) => {
@@ -163,17 +163,16 @@
         rules2: {
           passOld: [
             {required: true, message: '请输入旧密码', trigger: 'blur'},
-            // { min: 6, message: '长度至少6位', trigger: 'blur' }
           ],
           pass: [
             {validator: validatePass, trigger: 'blur'},
-            {required: true, message: '请输入新密码', trigger: 'blur'},
-            {min: 6, message: '长度至少6位', trigger: 'blur'}
+            // {required: true, message: '请输入新密码', trigger: 'blur'},
+            {min: 1, max: 18, message: '长度在 1 到 18 个字符', trigger: 'blur'}
+
           ],
           checkPass: [
             {validator: validatePass2, trigger: 'blur'},
             {required: true, message: '请再次输入密码', trigger: 'blur'},
-            {min: 6, message: '长度至少6位', trigger: 'blur'}
           ]
         },
         auth: []
@@ -228,14 +227,20 @@
                 this.editPassword = false;
                 this.$message({
                   type: 'success',
-                  message: '密码修改成功!'
+                  message: '密码修改成功!需重新登录生效'
                 });
+                storage.delete('Authorization');
+                storage.delete('userName');
+                storage.delete('auth');
+                storage.delete('token');
+                storage.delete('sysid');
+                this.$router.push({name: 'login'})
               } else if (res.data.code == 1001) {
                 this.signOut()
               } else {
                 this.$message({
                   type: 'error',
-                  message: '密码修改失败!'
+                  message: '密码修改失败!'+ res.data.message
                 });
               }
             })

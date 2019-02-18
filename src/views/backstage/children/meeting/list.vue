@@ -201,6 +201,7 @@
             :auto-upload="true"
             :multiple="true"
             :limit="5"
+            :before-upload="beforeUpload"
             :on-exceed="handleExceed"
             :on-success="succAdd"
             :on-remove="remAdd"
@@ -347,6 +348,7 @@
             :file-list="EditfileList"
             :multiple="true"
             :limit="5"
+            :before-upload="beforeUpload"
             :on-exceed="handleExceed"
             :on-success="succEdit"
             :on-remove="remEdit"
@@ -455,7 +457,7 @@
           mPhone: [
             {validator: checkPhone, trigger: 'blur'},
             { required: true, message: '必填', trigger: 'blur' },
-          ]
+          ],
 
           /* EditData: [
              { required: true, message: '必填', trigger: 'blur' },
@@ -697,6 +699,17 @@
       remAdd(file, fileList) {
         this.AddfileList = fileList;
       },
+      // 上传大小限制
+      beforeUpload(file) {
+        const isLt2M = file.size / 1024 / 1024 < 100     //这里做文件大小限制
+        if (!isLt2M) {
+          this.$message({
+            message: '上传文件大小不能超过 100MB!',
+            type: 'warning'
+          });
+        }
+        return isLt2M
+      },
       //编辑
       editOpen(id) {
         if(this.$refs.editObject){
@@ -885,6 +898,7 @@
       },
       // 选择删除
       selectDel() {
+        this.activeTableDataId = [];
         if (this.multipleSelection.length == 0) {
           this.$message({
             type: 'info',
