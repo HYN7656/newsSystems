@@ -14,6 +14,7 @@
         ref="multipleTable"
         :data="tableData"
         tooltip-effect="dark"
+        show-overflow-tooltip="true"
         border
         v-loading="loading"
         style="width: 100%"
@@ -244,7 +245,8 @@
         this.checkedCities = [];
         this.addPop = true;
         this.loadingBtn = false;
-        this.isIndeterminate = true;
+        this.checkAll = false;
+        this.isIndeterminate = false;
         this.addObject = {
           uName: '',
           powerList: []
@@ -329,6 +331,8 @@
         }
         this.look = false;
         this.loadingBtn = false;
+
+        // this.EditcheckAll = checkedCount === this.power.length;
         this.title = "编辑";
         this.EditcheckedCities = [];
         this.editObject = {
@@ -356,7 +360,14 @@
                 }
               }
             }
-            // console.log(this.EditcheckedCities);
+            console.log(this.EditcheckedCities);
+            if(this.EditcheckedCities.length == this.power.length) {
+              this.EditcheckAll = true;
+              this.EditisIndeterminate = false;
+            }else {
+              this.EditcheckAll = false;
+              this.EditisIndeterminate = true;
+            }
             // console.log(this.editObject.powerList);
           } else if (res.data.code == 1001) {
             this.signOut();

@@ -14,6 +14,7 @@
         ref="multipleTable"
         :data="tableData"
         tooltip-effect="dark"
+        show-overflow-tooltip="true"
         border
         v-loading="loading"
         style="width: 100%"
@@ -449,7 +450,7 @@
           ],
           mContacts: [
             { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
           ],
           data: [
             { required: true, message: '必填', trigger: 'blur' },

@@ -9,6 +9,7 @@
         ref="multipleTable"
         :data="tableData"
         tooltip-effect="dark"
+        show-overflow-tooltip="true"
         border
         v-loading="loading"
         style="width: 100%"

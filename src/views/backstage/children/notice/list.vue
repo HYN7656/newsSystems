@@ -23,6 +23,7 @@
       <el-table
         ref="multipleTable"
         :data="tableData"
+        show-overflow-tooltip="true"
         tooltip-effect="dark"
         v-loading="loading"
         border
