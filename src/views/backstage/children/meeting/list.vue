@@ -188,9 +188,11 @@
             <el-button v-else class="button-new-tag" size="small" @click="AddshowInput2">+ 添加参会单位</el-button>
           </div>
         </div>
-        <div class="cell marbot20">
-          <span class="name padlet5">备注：</span>
+        <div class="cell bz">
+          <el-form-item label="备注：" prop="mRemarks">
+          <!--<span class="name padlet5" prop="mRemarks">备注：</span>-->
           <el-input type="textarea" v-model="addObject.mRemarks" class="flew-input"></el-input>
+          </el-form-item>
         </div>
         <div class="cell marbot20">
           <span class="name padlet5">上传附件：</span>
@@ -336,10 +338,16 @@
             <el-button v-else class="button-new-tag" size="small" @click="EditshowInput2">+ 添加参会单位</el-button>
           </div>
         </div>
-        <div class="cell marbot20">
-          <span class="name padlet5">备注：</span>
-          <el-input type="textarea" v-model="editObject.mRemarks" class="flew-input"></el-input>
+        <div class="cell bz">
+          <el-form-item label="备注：" prop="mRemarks">
+            <!--<span class="name padlet5" prop="mRemarks">备注：</span>-->
+            <el-input type="textarea" v-model="editObject.mRemarks" class="flew-input"></el-input>
+          </el-form-item>
         </div>
+       <!-- <div class="cell marbot20 bz">
+          <span class="name padlet5" prop="mRemarks">备注：</span>
+          <el-input type="textarea" v-model="editObject.mRemarks" class="flew-input"></el-input>
+        </div>-->
         <div class="cell marbot20">
           <span class="name padlet5">上传附件：</span>
           <el-upload
@@ -459,7 +467,9 @@
             {validator: checkPhone, trigger: 'blur'},
             { required: true, message: '必填', trigger: 'blur' },
           ],
-
+          mRemarks:[
+            { min: 1, max: 200, message: '长度在 1 到 200 个字符', trigger: 'blur' }
+          ]
           /* EditData: [
              { required: true, message: '必填', trigger: 'blur' },
            ]*/
@@ -589,6 +599,14 @@
           if (res.data.code == 200) {
             // console.log(res.data);
             this.tableData = res.data.data;
+            this.total = res.data.count;
+            for (var i = 0; i < this.tableData.length; i++) {
+              if (this.tableData[i].mstatus == '1') {
+                this.tableData[i].fbStatus = true;
+              } else {
+                this.tableData[i].fbStatus = false;
+              }
+            }
           } else if(res.data.code == 1001){
             this.signOut();
           } else {
@@ -744,8 +762,16 @@
           // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
-            this.editObject.mHostUnit = res.data.data.data.mHostUnit.split(',');
-            this.editObject.mParticipatingUnits = res.data.data.data.mParticipatingUnits.split(',');
+            if(!this.editObject.mHostUnit){
+              this.editObject.mHostUnit = [];
+            }else {
+              this.editObject.mHostUnit = res.data.data.data.mHostUnit.split(',');
+            }
+            if(!this.editObject.mParticipatingUnits){
+              this.editObject.mParticipatingUnits = [];
+            }else{
+              this.editObject.mParticipatingUnits = res.data.data.data.mParticipatingUnits.split(',');
+            }
             var arr = [];
             arr[0] = res.data.data.data.mStartTime;
             arr[1] = res.data.data.data.mEndTime;
@@ -1164,6 +1190,11 @@
     }
   }
 </script>
+<style>
+.bz .el-form-item__label {
+  padding-left: 5px;
+}
+</style>
 
 <style lang="less">
   @import "./../../../../assets/styles/edit-pop.less";

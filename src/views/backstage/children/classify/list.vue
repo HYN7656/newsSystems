@@ -105,7 +105,7 @@
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="100px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
-          <el-form-item label="上级分类：">
+          <el-form-item label="上级分类：" v-show="EdittypeShow">
             <el-select v-model="editObject.iPid" placeholder="请选择" style="width: 100%">
               <el-option
                 v-for="item in treeListP"

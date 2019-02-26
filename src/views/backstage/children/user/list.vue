@@ -360,7 +360,7 @@
                 }
               }
             }
-            console.log(this.EditcheckedCities);
+            // console.log(this.EditcheckedCities);
             if(this.EditcheckedCities.length == this.power.length) {
               this.EditcheckAll = true;
               this.EditisIndeterminate = false;

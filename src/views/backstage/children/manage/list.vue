@@ -425,6 +425,13 @@
           if (res.data.code == 200) {
             this.tableData = res.data.data;
             this.total = res.data.count;
+            for (var i = 0; i < this.tableData.length; i++) {
+              if (this.tableData[i].fStatus == '1') {
+                this.tableData[i].fbStatus = true;
+              } else {
+                this.tableData[i].fbStatus = false;
+              }
+            }
           } else if(res.data.code == 1001){
             this.signOut();
           } else {

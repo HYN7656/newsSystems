@@ -134,8 +134,16 @@
               arr.startTime = arr.mStartTime.slice(0,19);
               arr.endTime = arr.mEndTime.slice(0,19);
               this.datail = arr;
-              this.partakeHost = res.data.data.data.mHostUnit.split(',');
-              this.partakeCompany = res.data.data.data.mParticipatingUnits.split(',');
+              if(!res.data.data.data.mHostUnit){
+                this.partakeHost = [];
+              }else {
+                this.partakeHost = res.data.data.data.mHostUnit.split(',');
+              }
+              if(!res.data.data.data.mParticipatingUnits){
+                this.partakeCompany = [];
+              }else {
+                this.partakeCompany = res.data.data.data.mParticipatingUnits.split(',');
+              }
             }else if(res.data.code == 1001){
               this.signOut();
             }
