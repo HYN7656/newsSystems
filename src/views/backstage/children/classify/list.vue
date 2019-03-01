@@ -77,7 +77,7 @@
         </div>
         <div class="cell" v-show="AddtypeShow">
           <el-form-item label="类别：">
-            <el-select v-model="addObject.iType" placeholder="请选择" style="width: 100%" @change="ChoicePidEdit">
+            <el-select v-model="addObject.iType" placeholder="请选择" style="width: 100%" >
               <el-option
                 v-for="item in option"
                 :key="item.id"
@@ -116,7 +116,7 @@
             </el-select>
           </el-form-item>
         </div>
-        <div class="cell" v-show="EdittypeShow">
+        <!--<div class="cell" v-show="EdittypeShow">
           <el-form-item label="类别：">
             <el-select v-model="editObject.iType" placeholder="请选择" style="width: 100%">
               <el-option
@@ -127,7 +127,7 @@
               </el-option>
             </el-select>
           </el-form-item>
-        </div>
+        </div>-->
         <div class="cell">
           <el-form-item label="分类：" prop="iName">
           <!--<span class="name">分类：</span>-->
