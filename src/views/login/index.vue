@@ -79,7 +79,7 @@
           params['uPasswd'] = Utils.encrypt(this.userPassword);
           console.log(params);
           API.post('/ususer/login', params).then((res) => {
-            // console.log(res.data);
+            console.log(res.data);
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',

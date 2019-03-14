@@ -122,15 +122,19 @@
             </el-date-picker>
           </el-form-item>
         </div>
-        <div class="cell marbot20">
-          <span class="name padlet5">会议简介：</span>
+        <div class="cell bz">
+          <!--<span class="name padlet5">会议简介：</span>-->
+          <el-form-item label="会议简介：" prop="mBrief">
           <el-input type="textarea" v-model="addObject.mBrief" class="flew-input"></el-input>
+          </el-form-item>
         </div>
         <el-row>
           <el-col :span="11">
-            <div class="cell marbot20">
-              <span class="name padlet5">联系人微信：</span>
+            <div class="cell bz">
+              <el-form-item label="联系人微信：" prop="mWechat">
+              <!--<span class="name padlet5">联系人微信：</span>-->
               <el-input v-model="addObject.mWechat" placeholder="请输入内容" class="flew-input"></el-input>
+              </el-form-item>
             </div>
           </el-col>
           <el-col :span="11" :offset="2">
@@ -272,15 +276,19 @@
             style="width: 780px">
           </el-date-picker>
         </div>
-        <div class="cell marbot20">
-          <span class="name padlet5">会议简介：</span>
+        <div class="cell bz">
+          <!--<span class="name padlet5">会议简介：</span>-->
+          <el-form-item label="会议简介：" prop="mBrief">
           <el-input type="textarea" v-model="editObject.mBrief" class="flew-input"></el-input>
+          </el-form-item>
         </div>
         <el-row>
           <el-col :span="11">
-            <div class="cell marbot20">
-              <span class="name padlet5">联系人微信：</span>
+            <div class="cell bz">
+              <!--<span class="name padlet5">联系人微信：</span>-->
+              <el-form-item label="联系人微信：" prop="mWechat">
               <el-input v-model="editObject.mWechat" placeholder="请输入内容" class="flew-input"></el-input>
+              </el-form-item>
             </div>
           </el-col>
           <el-col :span="11" :offset="2">
@@ -411,6 +419,14 @@
 
         }*/
       };
+      var validatePass = (rule, value, callback) => {
+        const reg = /^[0-9a-zA-Z]*$/g;
+        if (reg.test(value)){
+          callback();
+        } else {
+          return callback(new Error('微信名只能为字母、数字或组合'));
+        }
+      };
       return {
         loadingBtn:false,
         loading: false,
@@ -469,7 +485,14 @@
           ],
           mRemarks:[
             { min: 1, max: 200, message: '长度在 1 到 200 个字符', trigger: 'blur' }
-          ]
+          ],
+          mBrief : [
+            { min: 1, max: 200, message: '长度在 1 到 200 个字符', trigger: 'blur' }
+          ],
+          mWechat : [
+            { min: 1, max: 200, message: '长度在 1 到 200 个字符', trigger: 'blur' },
+            {validator: validatePass, trigger: 'blur'},
+          ],
           /* EditData: [
              { required: true, message: '必填', trigger: 'blur' },
            ]*/
