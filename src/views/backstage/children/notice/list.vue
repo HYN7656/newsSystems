@@ -126,21 +126,45 @@
             </span>
       </el-dialog>
       <el-dialog
-        width="540px"
-        title="选择用户"
-        :visible.sync="innerTipPop"
+        title="用户选择"
+        :visible.sync="userPop"
         append-to-body
-        :close-on-click-modal="false">
-        <el-transfer
-          filterable
-          filter-placeholder="请输入用户姓名"
-          :titles="['用户列表', '已选用户']"
-          v-model="userList"
-          :data="userData">
-        </el-transfer>
-        <div slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="userBox()" class="confirm">确 定</el-button>
+        class="tip-dialog assign-detail-dialog"
+        :close-on-click-modal="false"
+      >
+        <div class="pop-content">
+          <div class="role-cell" style="width: 70%">
+            <div class="role-cell-title">用户列表：</div>
+            <div class="role-cell-content">
+              <el-tree
+                :data="listOrg"
+                @node-click="fpTreeClick"
+                :props="defaultProps"
+                :expand-on-click-node="false"
+                :default-expand-all="true"
+              ></el-tree>
+            </div>
+          </div>
+          <div class="role-cell">
+            <div class="role-cell-title">所选用户：</div>
+            <div class="role-cell-content">
+              <div
+                class="user"
+                v-for="(list,index) in chooseUserData"
+
+                @click="delRoleClick(index)"
+              >
+                <i class="fa fa-user"></i>
+                {{list.label}}
+              </div>
+            </div>
+          </div>
         </div>
+        <span slot="footer" class="dialog-footer">
+        <el-button type="success">确定分配</el-button>
+        <el-button type="primary" @click="clearAssign">清除已选</el-button>
+        <el-button type="info">关 闭</el-button>
+      </span>
       </el-dialog>
       <div class="content">
         <div class="cell">
@@ -157,7 +181,7 @@
         <div class="cell">
           <span class="name">相关用户：</span>
           <el-input v-model="Msg.MsgUserInp" placeholder="请输入内容" class="flew-input input-user" disabled></el-input>
-          <span class="btn" @click="innerTipPop = true">选择</span>
+          <span class="btn" @click="userPop = true">选择</span>
         </div>
       </div>
       <div slot="footer" class="dialog-footer">
@@ -343,6 +367,13 @@
     components: {quillEditor},
     data() {
       return {
+        chooseUserData:[],
+        listOrg:[],
+        userPop:false,
+        defaultProps: {
+          children: "children",
+          label: "label"
+        },
         loadingBtn:false,
         loading: false,
         editPop: false,
@@ -368,7 +399,7 @@
           MsgText: '',
           MsgUserInp: ''
         },
-        userData: [{
+       /* userData: [{
           key: '1',
           label: '张三',
           disabled: false
@@ -380,7 +411,7 @@
           key: '3',
           label: '王麻子',
           disabled: true
-        }],
+        }],*/
         userList: [],
         addObject: {
           nTitle: '',
@@ -467,6 +498,41 @@
 //      }
     },
     methods: {
+      // 清除已选
+      clearAssign() {
+        this.chooseUserData = [];
+      },
+      // 点击右侧已选择的删除
+      delRoleClick(idx){
+        this.chooseUserData.splice(idx, 1);
+      },
+      // 用户角色树点击
+      fpTreeClick(val){
+        // this.userData = [];
+        console.log(val)
+       /* if (val.mId == "0") {
+          let params = {};
+          params["MechanismId"] = val.id;
+          params["userId"] = this.arrXZ.join(",");
+          API.get("/user/findUserByMechanismId", params, {
+            Authorization: storage.get("Token")
+          }).then(res => {
+            // console.log(res.data)
+            if (res.data.code == 200) {
+              if (res.data.data) {
+                this.userData = this.getStaff(res.data.data);
+              }
+            } else if (res.data.code == 1001) {
+              this.signOut();
+            } else if (res.data.code == 401) {
+              this.$router.push({name: "auth"});
+            }
+          });
+        }*/
+      },
+
+
+
 // 页面初始化
       getPage() {
         let params = {};
@@ -1041,12 +1107,109 @@
     },
   }
 </script>
+<style>
+  .assign-detail-dialog  .el-dialog {
+    width: 600px !important;
+    position: relative;
+  }
+  .assign-detail-dialog  .el-dialog .pop-content {
+    text-align: left;
+    overflow-y: auto;
+    height: 100%;
+    width: 100%;
+  }
+  .assign-detail-dialog  .el-dialog .pop-content .role-cell {
+    float: left;
+    height: auto;
+    margin: 0 1%;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border-right: 1px solid #ccc;
+  }
+  .assign-detail-dialog  .el-dialog .pop-content .role-cell:last-child {
+    border-right: none;
+  }
+  .assign-detail-dialog  .el-dialog .pop-content .role-cell-content {
+     margin-top: 20px;
+   }
+  .assign-detail-dialog  .el-dialog .pop-content .role-cell-content .user {
+    height: 30px;
+    cursor: pointer;
+    line-height: 30px;
+  }
+  .assign-detail-dialog  .el-dialog .el-dialog__body {
+    height: 500px;
+    overflow: hidden;
+  }
+  .assign-detail-dialog  .el-dialog .el-dialog__footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+  }
+  .assign-detail-dialog .el-dialog .dialog-footer .el-button:nth-of-type(2) {
+    margin-left: 0!important;
+  }
+
+</style>
 
 <style lang="less">
   @import "./../../../../assets/styles/edit-pop.less";
   @import "./../../../../assets/styles/base2";
 
   .backstage-notice-page {
+    .el-dialog__wrapper.tip-dialog {
+      &.assign-detail-dialog {
+        .el-dialog {
+          // margin: 10vh auto !important;
+          width: 600px !important;
+          position: relative;
+          // height: 700px;
+          .pop-content {
+            text-align: left;
+            overflow-y: auto;
+            height: 100%;
+            width: 100%;
+            .role-cell {
+              float: left;
+              height: auto;
+              margin: 0 1%;
+              -webkit-box-sizing: border-box;
+              box-sizing: border-box;
+              border-right: 1px solid #ccc;
+              &:last-child {
+                border-right: none;
+              }
+              /*.role-cell:nth-of-type(2){
+                width: 70%;
+              }
+              .role-cell:nth-of-type(1){
+                width: 25%;
+              }*/
+            }
+            .role-cell-content {
+              margin-top: 20px;
+              .user {
+                height: 30px;
+                cursor: pointer;
+                line-height: 30px;
+              }
+            }
+          }
+          .el-dialog__body {
+            height: 500px;
+            overflow: hidden;
+          }
+          .el-dialog__footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+          }
+        }
+      }
+    }
+
     .footer-top > .el-dialog > .el-dialog__footer {
       padding: 0px 20px 20px !important;
     }
