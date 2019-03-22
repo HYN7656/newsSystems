@@ -15,7 +15,7 @@
           </el-option>
         </el-select>
       </div>
-      <div class="btn-cell" @click="goReset" >搜索</div>
+      <div class="btn-cell" @click="goReset">搜索</div>
       <div class="btn-cell" @click="addOpen">添加</div>
       <div class="btn-cell" @click="selectDel">删除</div>
     </div>
@@ -110,18 +110,18 @@
     <el-dialog title="短信提醒" :visible.sync="tipPop" class="tip-dialog footer-top" :close-on-click-modal="false">
       <el-dialog
         title="模板"
-        :visible.sync="dialogVisible"
+        :visible.sync="temPop"
         width="30%"
         append-to-body
         :close-on-click-modal="false">
         <div>
           <div class="mb-box" v-for="(l,index) in msgList" :key="l.key">
-            <input type="radio" v-model="messAge" :name="'radio[]'" :value="l.value">
-            <span>{{l.value}}</span>
+            <input type="radio" v-model="messAge" :name="'radio[]'" :value="l.content">
+            <span>{{l.content}}</span>
           </div>
         </div>
         <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button @click="temPop = false">取 消</el-button>
             <el-button type="primary" @click="mbSave">确 定</el-button>
             </span>
       </el-dialog>
@@ -133,19 +133,35 @@
         :close-on-click-modal="false"
       >
         <div class="pop-content">
-          <div class="role-cell" style="width: 70%">
-            <div class="role-cell-title">用户列表：</div>
+          <div class="role-cell" style="width: 40%">
+            <div class="role-cell-title">角色列表：</div>
             <div class="role-cell-content">
-              <el-tree
-                :data="listOrg"
-                @node-click="fpTreeClick"
-                :props="defaultProps"
-                :expand-on-click-node="false"
-                :default-expand-all="true"
-              ></el-tree>
+              <div
+                class="user"
+                v-for="(list,index) in userRoleData"
+
+                @click="UserRoleClick(list.id)"
+              >
+                <i class="fa fa-user"></i>
+                {{list.roleName}}
+              </div>
             </div>
           </div>
-          <div class="role-cell">
+          <div class="role-cell" style="width: 20%">
+            <div class="role-cell-title">用户列表：</div>
+            <div class="role-cell-content">
+              <div
+                class="user"
+                v-for="(list,index) in userData"
+
+                @click="userClick(list)"
+              >
+                <i class="fa fa-user"></i>
+                {{list.uname}}
+              </div>
+            </div>
+          </div>
+          <div class="role-cell" style="width: 30%">
             <div class="role-cell-title">所选用户：</div>
             <div class="role-cell-content">
               <div
@@ -155,32 +171,32 @@
                 @click="delRoleClick(index)"
               >
                 <i class="fa fa-user"></i>
-                {{list.label}}
+                {{list.uname}}
               </div>
             </div>
           </div>
         </div>
         <span slot="footer" class="dialog-footer">
-        <el-button type="success">确定分配</el-button>
+        <el-button type="success" @click="saveAssign">确定分配</el-button>
         <el-button type="primary" @click="clearAssign">清除已选</el-button>
-        <el-button type="info">关 闭</el-button>
+        <el-button type="info" @click="userPop = false" >关 闭</el-button>
       </span>
       </el-dialog>
       <div class="content">
         <div class="cell">
-          <span class="name">短信内容：</span>
+          <span class="name" style="line-height: 20px">短信内容：</span>
           <el-input
             type="textarea"
             :rows="5"
             class="flew-input"
             placeholder="请输入内容"
-            v-model="Msg.MsgText">
+            v-model="MsgText">
           </el-input>
           <span class="btn" @click="modelbox">模板</span>
         </div>
         <div class="cell">
           <span class="name">相关用户：</span>
-          <el-input v-model="Msg.MsgUserInp" placeholder="请输入内容" class="flew-input input-user" disabled></el-input>
+          <el-input v-model="MsgUserInp" placeholder="请输入内容" class="flew-input input-user" disabled></el-input>
           <span class="btn" @click="userPop = true">选择</span>
         </div>
       </div>
@@ -192,78 +208,78 @@
     <!--添加弹框-->
     <el-dialog title="添加公告" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
-      <div class="content" >
-        <div class="cell">
-          <el-form-item label="标题：" prop="nTitle">
-          <!--<span class="name">标题：</span>-->
-          <el-input v-model="addObject.nTitle" placeholder="请输入内容" class="flew-input"></el-input>
-          </el-form-item>
+        <div class="content">
+          <div class="cell">
+            <el-form-item label="标题：" prop="nTitle">
+              <!--<span class="name">标题：</span>-->
+              <el-input v-model="addObject.nTitle" placeholder="请输入内容" class="flew-input"></el-input>
+            </el-form-item>
+          </div>
+          <div class="cell">
+            <el-form-item label="分类：" prop="iId">
+              <!--<span class="name">分类：</span>-->
+              <el-select v-model="addObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 820px">
+                <el-option
+                  v-for="item in options"
+                  :key="item.id"
+                  :label="item.iName"
+                  :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <el-row>
+            <el-col :span="11">
+              <div class="cell">
+                <el-form-item label="作者：" prop="nAuthor">
+                  <!--<span class="name">作者：</span>-->
+                  <el-input v-model="addObject.nAuthor" placeholder="请输入内容" class="flew-input"></el-input>
+                </el-form-item>
+              </div>
+            </el-col>
+            <el-col :span="11" :offset="2">
+              <div class="cell">
+                <!--<span class="name">来源：</span>-->
+                <el-form-item label="来源：" prop="nFrom">
+                  <el-input v-model="addObject.nFrom" placeholder="请输入内容" class="flew-input"></el-input>
+                </el-form-item>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="11">
+              <div class="cell">
+                <span class="name">上传附件：</span>
+                <el-upload
+                  ref="Addupload"
+                  class="upload-demo"
+                  :action="uploadUrl()"
+                  :file-list="AddfileList"
+                  :auto-upload="true"
+                  :multiple="true"
+                  :limit="5"
+                  :before-upload="beforeUpload"
+                  :on-exceed="handleExceed"
+                  :on-success="succAdd"
+                  :on-remove="remAdd"
+                  :headers="myHeaders">
+                  <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
+                  <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                </el-upload>
+              </div>
+            </el-col>
+            <el-col :span="11" :offset="2">
+            </el-col>
+          </el-row>
+          <div class="cell" style="margin-top: 20px;">
+            <span class="name">内容：</span>
+            <quill-editor ref="myTextEditor"
+                          v-model="addObject.nContent"
+                          :config="editorOption"
+                          @change="onAddChange($event)"
+                          style="margin-left: 23px;height: 300px">
+            </quill-editor>
+          </div>
         </div>
-        <div class="cell">
-          <el-form-item label="分类：" prop="iId">
-          <!--<span class="name">分类：</span>-->
-          <el-select v-model="addObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 820px">
-            <el-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.iName"
-              :value="item.id"></el-option>
-          </el-select>
-          </el-form-item>
-        </div>
-        <el-row>
-          <el-col :span="11">
-            <div class="cell">
-              <el-form-item label="作者：" prop="nAuthor">
-              <!--<span class="name">作者：</span>-->
-              <el-input v-model="addObject.nAuthor" placeholder="请输入内容" class="flew-input"></el-input>
-              </el-form-item>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="cell">
-              <!--<span class="name">来源：</span>-->
-              <el-form-item label="来源：" prop="nFrom">
-              <el-input v-model="addObject.nFrom" placeholder="请输入内容" class="flew-input"></el-input>
-              </el-form-item>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="11">
-            <div class="cell">
-              <span class="name">上传附件：</span>
-              <el-upload
-                ref="Addupload"
-                class="upload-demo"
-                :action="uploadUrl()"
-                :file-list="AddfileList"
-                :auto-upload="true"
-                :multiple="true"
-                :limit="5"
-                :before-upload="beforeUpload"
-                :on-exceed="handleExceed"
-                :on-success="succAdd"
-                :on-remove="remAdd"
-                :headers="myHeaders">
-                <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
-                <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-              </el-upload>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-          </el-col>
-        </el-row>
-        <div class="cell" style="margin-top: 20px;">
-          <span class="name">内容：</span>
-          <quill-editor ref="myTextEditor"
-                        v-model="addObject.nContent"
-                        :config="editorOption"
-                        @change="onAddChange($event)"
-                        style="margin-left: 23px;height: 300px">
-          </quill-editor>
-        </div>
-      </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="addSave('addObject')" class="confirmAdd" :loading='loadingBtn'>确 定</el-button>
@@ -273,80 +289,81 @@
     <!--编辑弹框-->
     <el-dialog title="编辑" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="80px" class="demo-ruleForm">
-      <div class="content">
-        <div class="cell">
-          <el-form-item label="标题：" prop="nTitle">
-          <!--<span class="name">标题：</span>-->
-          <el-input v-model="editObject.nTitle" placeholder="请输入内容" class="flew-input"></el-input>
-          </el-form-item>
+        <div class="content">
+          <div class="cell">
+            <el-form-item label="标题：" prop="nTitle">
+              <!--<span class="name">标题：</span>-->
+              <el-input v-model="editObject.nTitle" placeholder="请输入内容" class="flew-input"></el-input>
+            </el-form-item>
+          </div>
+          <div class="cell">
+            <el-form-item label="分类：" prop="iId">
+              <!--<span class="name">分类：</span>-->
+              <el-select v-model="editObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 820px">
+                <el-option
+                  v-for="item in options"
+                  :key="item.id"
+                  :label="item.iName"
+                  :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+          </div>
+          <el-row>
+            <el-col :span="11">
+              <div class="cell">
+                <el-form-item label="作者：" prop="nAuthor">
+                  <!--<span class="name">作者：</span>-->
+                  <el-input v-model="editObject.nAuthor" placeholder="请输入内容" class="flew-input"></el-input>
+                </el-form-item>
+              </div>
+            </el-col>
+            <el-col :span="11" :offset="2">
+              <div class="cell">
+                <el-form-item label="来源：" prop="nFrom">
+                  <!--<span class="name">来源：</span>-->
+                  <el-input v-model="editObject.nFrom" placeholder="请输入内容" class="flew-input"></el-input>
+                </el-form-item>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="11">
+              <div class="cell">
+                <span class="name">上传附件：</span>
+                <el-upload
+                  ref="Editupload"
+                  class="upload-demo"
+                  :action="uploadUrl()"
+                  :file-list="EditfileList"
+                  :multiple="true"
+                  :limit="5"
+                  :before-upload="beforeUpload"
+                  :on-exceed="handleExceed"
+                  :on-success="succEdit"
+                  :on-remove="remEdit"
+                  :headers="myHeaders">
+                  <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
+                  <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                </el-upload>
+              </div>
+            </el-col>
+            <el-col :span="11" :offset="2">
+            </el-col>
+          </el-row>
+          <div class="cell" style="margin-top: 20px;">
+            <span class="name">内容：</span>
+            <quill-editor ref="myTextEditor"
+                          v-model="editObject.nContent"
+                          :config="editorOption"
+                          @change="onEditorChange($event)"
+                          style="margin-left: 23px;height: 500px">
+            </quill-editor>
+          </div>
         </div>
-        <div class="cell">
-          <el-form-item label="分类：" prop="iId">
-          <!--<span class="name">分类：</span>-->
-          <el-select v-model="editObject.iId" placeholder="请选择活动区域" class="flew-input" style="width: 820px">
-            <el-option
-              v-for="item in options"
-              :key="item.id"
-              :label="item.iName"
-              :value="item.id"></el-option>
-          </el-select>
-          </el-form-item>
-        </div>
-        <el-row>
-          <el-col :span="11">
-            <div class="cell">
-              <el-form-item label="作者：" prop="nAuthor">
-              <!--<span class="name">作者：</span>-->
-              <el-input v-model="editObject.nAuthor" placeholder="请输入内容" class="flew-input"></el-input>
-              </el-form-item>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-            <div class="cell">
-              <el-form-item label="来源：" prop="nFrom">
-              <!--<span class="name">来源：</span>-->
-              <el-input v-model="editObject.nFrom" placeholder="请输入内容" class="flew-input"></el-input>
-              </el-form-item>
-            </div>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="11">
-            <div class="cell">
-              <span class="name">上传附件：</span>
-              <el-upload
-                ref="Editupload"
-                class="upload-demo"
-                :action="uploadUrl()"
-                :file-list="EditfileList"
-                :multiple="true"
-                :limit="5"
-                :before-upload="beforeUpload"
-                :on-exceed="handleExceed"
-                :on-success="succEdit"
-                :on-remove="remEdit"
-                :headers="myHeaders">
-                <el-button size="small" type="primary" slot="trigger">选择文件</el-button>
-                <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-              </el-upload>
-            </div>
-          </el-col>
-          <el-col :span="11" :offset="2">
-          </el-col>
-        </el-row>
-        <div class="cell" style="margin-top: 20px;">
-          <span class="name">内容：</span>
-          <quill-editor ref="myTextEditor"
-                        v-model="editObject.nContent"
-                        :config="editorOption"
-                        @change="onEditorChange($event)"
-                        style="margin-left: 23px;height: 500px">
-          </quill-editor>
-        </div>
-      </div>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" :loading='loadingBtn'>确 定</el-button>
+        <el-button type="primary" @click="editSave('editObject')" class="confirmTip" :loading='loadingBtn'>确 定
+        </el-button>
         <el-button @click="editPop = false;loadingBtn=false" class="cancelTip">取 消</el-button>
       </div>
     </el-dialog>
@@ -358,7 +375,7 @@
   import {quillEditor} from 'vue-quill-editor'
   import * as Quill from 'quill' //引入编辑器
   //quill编辑器的字体
-  var fonts = ['SimSun', 'SimHei','Microsoft-YaHei','KaiTi','FangSong','Arial','Times-New-Roman','sans-serif'];
+  var fonts = ['SimSun', 'SimHei', 'Microsoft-YaHei', 'KaiTi', 'FangSong', 'Arial', 'Times-New-Roman', 'sans-serif'];
   var Font = Quill.import('formats/font');
   Font.whitelist = fonts; //将字体加入到白名单
   Quill.register(Font, true);
@@ -367,19 +384,21 @@
     components: {quillEditor},
     data() {
       return {
-        chooseUserData:[],
-        listOrg:[],
-        userPop:false,
-        defaultProps: {
-          children: "children",
-          label: "label"
-        },
-        loadingBtn:false,
+        MsgText:'',
+        MsgUserInp:'',
+        // MsgUserInpId:[],
+        MsgUserInpPhone:[],
+        userRoleData: [],
+        userData: [],
+        chooseUserData: [],
+        userPop: false,
+        loadingBtn: false,
         loading: false,
         editPop: false,
         addPop: false,
         tipPop: false,
         innerTipPop: false,
+        temPop:false,
         dialogVisible: false,
         // nSystemId : 1,
         // 搜索部分初始化
@@ -395,43 +414,26 @@
         messAge: '',
         msgList: [],
         AddfileList: [],
-        Msg: {
-          MsgText: '',
-          MsgUserInp: ''
-        },
-       /* userData: [{
-          key: '1',
-          label: '张三',
-          disabled: false
-        }, {
-          key: '2',
-          label: '李四',
-          disabled: false
-        }, {
-          key: '3',
-          label: '王麻子',
-          disabled: true
-        }],*/
         userList: [],
         addObject: {
           nTitle: '',
-          nImgUrl : '',
-          nurl : '',
-          nEnclUrl : '',
-          nEnclName : '',
+          nImgUrl: '',
+          nurl: '',
+          nEnclUrl: '',
+          nEnclName: '',
           nContent: '',
           nContents: '',
           nAuthor: '',
           nFrom: '',
           iId: ''
         },
-        myHeaders :{Authorization:storage.get('token')},
+        myHeaders: {Authorization: storage.get('token')},
         editObject: {
           nTitle: '',
-          nImgUrl : '',
-          nurl : '',
-          nEnclUrl : '',
-          nEnclName : '',
+          nImgUrl: '',
+          nurl: '',
+          nEnclUrl: '',
+          nEnclName: '',
           nContent: '',
           nContents: '',
           nAuthor: '',
@@ -440,18 +442,18 @@
         },
         rules: {
           nTitle: [
-            { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+            {required: true, message: '必填', trigger: 'blur'},
+            {min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur'}
           ],
           iId: [
-            { required: true, message: '必填', trigger: 'change' },
+            {required: true, message: '必填', trigger: 'change'},
           ],
           nAuthor: [
-            { required: true, message: '必填', trigger: 'blur' },
-            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
+            {required: true, message: '必填', trigger: 'blur'},
+            {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur'}
           ],
-          nFrom : [
-            { min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur' }
+          nFrom: [
+            {min: 1, max: 20, message: '长度在 1 到 20 个字符', trigger: 'blur'}
           ],
         },
         AddfileList: [],
@@ -461,76 +463,182 @@
         total: 0,
         // 富文本配置
         editorOption: {
-          modules:{
-            toolbar:[
+          modules: {
+            toolbar: [
               ['bold', 'italic', 'underline', 'strike'],
               ['blockquote', 'code-block'],
 
-              [{ 'header': 1 }, { 'header': 2 }],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              [{ 'script': 'sub'}, { 'script': 'super' }],
+              [{'header': 1}, {'header': 2}],
+              [{'list': 'ordered'}, {'list': 'bullet'}],
+              [{'script': 'sub'}, {'script': 'super'}],
               // [{ 'indent': '-1'}, { 'indent': '+1' }],
-              [{ 'direction': 'rtl' }],
+              [{'direction': 'rtl'}],
 
-              [{ 'size': [] }],
-              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+              [{'size': []}],
+              [{'header': [1, 2, 3, 4, 5, 6, false]}],
 
-              [{ 'color': [] }, { 'background': [] }],
-              [{ 'font': fonts }],    //把上面定义的字体数组放进来
+              [{'color': []}, {'background': []}],
+              [{'font': fonts}],    //把上面定义的字体数组放进来
 
-              [{ 'align': [] }],
+              [{'align': []}],
 
               ['clean'],
-              ['image','video']
+              ['image', 'video']
             ]
           },
-          theme:'snow'
+          theme: 'snow'
         },
-        num:0,
-        searchNum:0
-
-
+        num: 0,
+        searchNum: 0
       }
     },
-    computed: {
-//      editor() {
-//        return this.$refs.myTextEditor.quillEditor
-//      }
-    },
     methods: {
+      // 短信提醒
+      tip(id) {
+        this.tipPop = true;
+        this.chooseUserData = [];
+        this.MsgUserInp = '';
+        // this.MsgUserInpId = [];
+        this.MsgUserInpPhone = [];
+        this.userData = [];
+        this.MsgText = '';
+        this.messAge = "";
+      },
+      // 短信保存
+      MesSave() {
+        if(this.MsgUserInpPhone.length>0){
+          let params = {};
+          // params["userId"] = this.MsgUserInpId;
+          params["Content"] = this.MsgText;
+          params["phone"] = this.MsgUserInpPhone;
+          params["type"] = 4;
+          // console.log(params)
+          API.post("/notice/sendMessage", params, {
+            Authorization: storage.get("token")
+          }).then(res => {
+            // console.log(res.data)
+            if (res.data.code == 200) {
+              this.$message({
+                type: 'success',
+                message: '发送成功！'
+              });
+              this.tipPop = false;
+            } else if (res.data.code == 1001) {
+              this.signOut();
+            } else {
+              console.log(res.data.data.message);
+            }
+          });
+        }else {
+          this.$message({
+            type: 'error',
+            message: '请选择用户！'
+          });
+        }
+      },
+      // 短信模板
+      modelbox() {
+        this.temPop = true;
+      },
+      // 短信模板保存
+      mbSave() {
+        this.temPop = false;
+        // console.log(this.messAge)
+        this.MsgText = this.messAge;
+      },
+      // 确定分配
+      saveAssign(){
+        // console.log(this.chooseUserData);
+        // var arr=[];
+        var arr2=[];
+        var arr3=[];
+        for(var i=0;i<this.chooseUserData.length;i++){
+          // arr.push(this.chooseUserData[i].id);
+          arr2.push(this.chooseUserData[i].uname);
+          arr3.push(this.chooseUserData[i].umobilephone);
+        }
+        this.MsgUserInp = arr2.join(',');
+        // this.MsgUserInpId = arr;
+        this.MsgUserInpPhone = arr3;
+        this.userPop = false;
+
+
+      },
+      // 用户列表
+      UserRoleClick(id) {
+        let params = {};
+        params["RoleId"] = id;
+        API.get("/Business/findByRoleId", params, {
+          Authorization: storage.get("token")
+        }).then(res => {
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            this.userData = res.data.data.data;
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          } else {
+            console.log(res.data.data.message);
+          }
+        });
+      },
+
+      //角色列表
+      getUser() {
+        let params = {};
+        API.get("/Business/findRoleAll ", params, {
+          Authorization: storage.get("token")
+        }).then(res => {
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            this.userRoleData = res.data.data;
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          } else {
+            console.log(res.data);
+          }
+        });
+      },
+      // 模板列表
+      getTem(){
+        let params = {};
+        API.get("/code/FindAll ", params, {
+          Authorization: storage.get("token")
+        }).then(res => {
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            this.msgList = res.data.data;
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          } else {
+            console.log(res.data);
+          }
+        });
+      },
+
+      // 选择用户
+      userClick(val) {
+        if(this.chooseUserData.length>0){
+          for(var i=0;i<this.chooseUserData.length;i++){
+            if(this.chooseUserData[i].id == val.id) {
+              return;
+            }
+          }
+          this.chooseUserData.push(val);
+        }else {
+          this.chooseUserData.push(val);
+        }
+        // console.log(this.chooseUserData)
+      },
+
       // 清除已选
       clearAssign() {
         this.chooseUserData = [];
       },
       // 点击右侧已选择的删除
-      delRoleClick(idx){
+      delRoleClick(idx) {
         this.chooseUserData.splice(idx, 1);
+        // console.log(this.chooseUserData)
       },
-      // 用户角色树点击
-      fpTreeClick(val){
-        // this.userData = [];
-        console.log(val)
-       /* if (val.mId == "0") {
-          let params = {};
-          params["MechanismId"] = val.id;
-          params["userId"] = this.arrXZ.join(",");
-          API.get("/user/findUserByMechanismId", params, {
-            Authorization: storage.get("Token")
-          }).then(res => {
-            // console.log(res.data)
-            if (res.data.code == 200) {
-              if (res.data.data) {
-                this.userData = this.getStaff(res.data.data);
-              }
-            } else if (res.data.code == 1001) {
-              this.signOut();
-            } else if (res.data.code == 401) {
-              this.$router.push({name: "auth"});
-            }
-          });
-        }*/
-      },
-
 
 
 // 页面初始化
@@ -538,7 +646,7 @@
         let params = {};
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
-        API.get('/notice/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/notice/FindAll', params, {Authorization: storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
             // console.log(res.data);
             // console.log(res.data);
@@ -547,11 +655,11 @@
             for (var i = 0; i < this.tableData.length; i++) {
               if (this.tableData[i].nStatus == '1') {
                 this.tableData[i].fbStatus = true;
-              }  else {
+              } else {
                 this.tableData[i].fbStatus = false;
               }
             }
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             console.log(res.data);
@@ -567,7 +675,7 @@
         params['page'] = this.currentPage;
         params['count'] = this.pageSize;
         // console.log(params);
-        API.get('/notice/FindBytitle', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/notice/FindBytitle', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.tableData = res.data.data;
@@ -575,18 +683,18 @@
             for (var i = 0; i < this.tableData.length; i++) {
               if (this.tableData[i].nStatus == '1') {
                 this.tableData[i].fbStatus = true;
-              }  else {
+              } else {
                 this.tableData[i].fbStatus = false;
               }
             }
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             console.log(res.data);
           }
         });
       },
-      goReset(){
+      goReset() {
         this.currentPage = 1;
         this.pageSize = 10;
         this.searchNum = 1;
@@ -600,19 +708,19 @@
         this.num = 0;
         this.addObject = {
           nTitle: '',
-          nImgUrl : '',
-          nurl : '',
-          nEnclUrl : '',
-          nEnclName : '',
+          nImgUrl: '',
+          nurl: '',
+          nEnclUrl: '',
+          nEnclName: '',
           nContent: '',
           nContents: '',
           nAuthor: '',
           nFrom: '',
           iId: ''
         }
-        if(this.$refs.addObject){
+        if (this.$refs.addObject) {
           this.$refs.addObject.clearValidate();
-        }else {
+        } else {
           return;
         }
       },
@@ -621,7 +729,7 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.num++;
-            if(this.num == 1) {
+            if (this.num == 1) {
               this.loadingBtn = true;
               // 上传数据
               var arr = [];
@@ -637,9 +745,9 @@
               let params = {};
               params['nTitle'] = this.addObject.nTitle;
               params['nContent'] = this.addObject.nContent;
-              if(this.addObject.nContents){
+              if (this.addObject.nContents) {
                 params['nContents'] = this.addObject.nContents.replace(/[\r\n]/g, "");
-              }else {
+              } else {
                 params['nContents'] = '';
               }
               // params['nImgUrl'] = this.addObject.nurl;
@@ -650,7 +758,7 @@
               params['iId'] = this.addObject.iId;
               params['nSystemId'] = storage.get('sysid');
               // console.log(params);
-              API.post('/notice/create', params,{Authorization:storage.get('token')}).then((res) => {
+              API.post('/notice/create', params, {Authorization: storage.get('token')}).then((res) => {
                 // console.log(res.data);
                 if (res.data.code == 200) {
                   this.addPop = false;
@@ -659,18 +767,18 @@
                     type: 'success',
                     message: '新增成功!'
                   });
-                } else if(res.data.code == 1001){
+                } else if (res.data.code == 1001) {
                   this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '新增失败!'+ res.data.message
+                    message: '新增失败!' + res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
                 }
               });
-            }else{
+            } else {
               return;
             }
           }
@@ -708,7 +816,7 @@
       },
       // 编辑
       editOpen(id) {
-        if(this.$refs.editObject){
+        if (this.$refs.editObject) {
           this.$refs.editObject.clearValidate();
         }
         this.editPop = true;
@@ -729,7 +837,7 @@
         }
         let params = {};
         params['id'] = id;
-        API.get('/notice/FindById', params,{Authorization:storage.get('token')}).then((res) => {
+        API.get('/notice/FindById', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
@@ -743,7 +851,7 @@
               obj.push({url: res.data.data.file[i].fenclUrl, name: res.data.data.file[i].fenclName});
             }
             this.EditfileList = obj;
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             console.log(res.data);
@@ -754,8 +862,8 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.num ++;
-            if(this.num == 1) {
+            this.num++;
+            if (this.num == 1) {
               this.loadingBtn = true;
               // 上传部分
               var arr = [];
@@ -771,20 +879,22 @@
               }
               this.editObject.nEnclUrl = arr.join(',');
               this.editObject.nEnclName = arr2.join(',');
-              function find(str,cha,num){
-                var x=str.indexOf(cha);
-                for(var i=0;i<num-1;i++){
-                  x=str.indexOf(cha,x+1);
+
+              function find(str, cha, num) {
+                var x = str.indexOf(cha);
+                for (var i = 0; i < num - 1; i++) {
+                  x = str.indexOf(cha, x + 1);
                 }
                 return x;
               }
+
               let params = {};
               params['id'] = this.editObject.id;
               params['nTitle'] = this.editObject.nTitle;
               params['nContent'] = this.editObject.nContent;
-              if(this.editObject.nContents){
+              if (this.editObject.nContents) {
                 params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
-              }else {
+              } else {
                 params['nContents'] = '';
               }
               params['nAuthor'] = this.editObject.nAuthor;
@@ -794,7 +904,7 @@
               params['iId'] = this.editObject.iId;
               params['nSystemId'] = storage.get('sysid');
               // console.log(params);
-              API.post('/notice/noticeUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+              API.post('/notice/noticeUpdate', params, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
                   this.editPop = false;
                   this.getPage();
@@ -802,18 +912,18 @@
                     type: 'success',
                     message: '编辑成功!'
                   });
-                } else if(res.data.code == 1001){
+                } else if (res.data.code == 1001) {
                   this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '编辑失败!'+ res.data.message
+                    message: '编辑失败!' + res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
                 }
               })
-            }else {
+            } else {
               return;
             }
           }
@@ -847,7 +957,7 @@
         return config.baseURL + '/newsInfo/newsFile'
       },*/
       // 上传文件地址
-      uploadUrl(){
+      uploadUrl() {
         return config.baseURL + '/newsInfo/newsFiles';
       },
       // 单个删除
@@ -860,19 +970,19 @@
           let params = {};
           params['id'] = id;
           params['nSystemId'] = storage.get('sysid');
-          API.delete('/notice/noticeDelete', params,{Authorization:storage.get('token')}).then((res) => {
+          API.delete('/notice/noticeDelete', params, {Authorization: storage.get('token')}).then((res) => {
             if (res.data.code == 200) {
               this.getPage();
               this.$message({
                 type: 'success',
                 message: '删除成功!'
               });
-            } else if(res.data.code == 1001){
+            } else if (res.data.code == 1001) {
               this.signOut();
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'+ res.data.message
+                message: '删除失败!' + res.data.message
               });
             }
           });
@@ -904,7 +1014,7 @@
           let params = {};
           params['id'] = this.activeTableDataId2;
           params['nSystemId'] = storage.get('sysid');
-          API.delete('/notice/noticeDelete', params,{Authorization:storage.get('token')}).then((res) => {
+          API.delete('/notice/noticeDelete', params, {Authorization: storage.get('token')}).then((res) => {
             // console.log(res.data)
             if (res.data.code == 200) {
               this.$message({
@@ -912,12 +1022,12 @@
                 message: '删除成功!'
               });
               this.getPage();
-            } else if(res.data.code == 1001){
+            } else if (res.data.code == 1001) {
               this.signOut();
             } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'+ res.data.message
+                message: '删除失败!' + res.data.message
               });
             }
           });
@@ -930,58 +1040,58 @@
         params['nTop'] = nTop;
         params['nSystemId'] = storage.get('sysid');
         // console.log(params);
-        API.post('/notice/noticeupdatetop', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/notice/noticeupdatetop', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.getPage();
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             this.$message({
               type: 'error',
-              message: '置顶失败!'+ res.data.message
+              message: '置顶失败!' + res.data.message
             });
           }
         });
       },
       //发布
-      Release(id,nStatus) {
+      Release(id, nStatus) {
         let params = {};
         params['id'] = id;
         params['nStatus'] = nStatus;
         params['nSystemId'] = storage.get('sysid');
         // console.log(params);
-        API.post('/notice/noticerelease', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/notice/noticerelease', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.getPage();
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             this.$message({
               type: 'error',
-              message: '发布失败!'+ res.data.message
+              message: '发布失败!' + res.data.message
             });
           }
         });
       },
       // 取消发布
-      ReleaseNo(id,nStatus) {
+      ReleaseNo(id, nStatus) {
         let params = {};
         params['id'] = id;
         params['nStatus'] = nStatus;
         params['nSystemId'] = storage.get('sysid');
         // console.log(params);
-        API.post('/notice/noticerelease', params,{Authorization:storage.get('token')}).then((res) => {
+        API.post('/notice/noticerelease', params, {Authorization: storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
             this.getPage();
-          } else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           } else {
             this.$message({
               type: 'error',
-              message: '取消发布失败!'+ res.data.message
+              message: '取消发布失败!' + res.data.message
             });
           }
         });
@@ -990,10 +1100,10 @@
       classify() {
         let params = {};
         params['type'] = 1;
-        API.get('/ification/findByType', params,{Authorization:storage.get('token')}).then((res) => {
-          if(res.data.code == 200){
+        API.get('/ification/findByType', params, {Authorization: storage.get('token')}).then((res) => {
+          if (res.data.code == 200) {
             this.options = res.data.data;
-          }else if(res.data.code == 1001){
+          } else if (res.data.code == 1001) {
             this.signOut();
           }
           // console.log(this.options);
@@ -1002,48 +1112,6 @@
 
 
 
-
-      // 短信提醒
-      tip(id) {
-        this.tipPop = true;
-      },
-      // 短信用户选择
-      userBox() {
-        this.innerTipPop = false;
-        var arr = [];
-        for (var i = 0; i < this.userData.length; i++) {
-          for (var j = 0; j < this.userList.length; j++) {
-            if (this.userList[j] == this.userData[i].key) {
-              arr.push(this.userData[i].label);
-            }
-          }
-        }
-        this.Msg.MsgUserInp = arr.join(',');
-      },
-      // 短信保存
-      MesSave() {
-        this.tipPop = false;
-        // console.log(this.Msg);
-      },
-      // 短信模板
-      modelbox() {
-        this.dialogVisible = true;
-        let params = {};
-        API.get('static/dxmb.json', params).then((res) => {
-          if (res.status == 200) {
-            // console.log(res.data);
-            this.msgList = res.data;
-            this.messAge = res.data[0].value;
-          } else {
-            console.log(res.data);
-          }
-        })
-      },
-      // 短信模板保存
-      mbSave() {
-        this.Msg.MsgText = this.messAge;
-        this.dialogVisible = false;
-      },
       // 进入详情
       linkDetail(id) {
         this.$router.push({name: 'backstage.notice.detail', query: {id: id}});
@@ -1052,9 +1120,9 @@
       handleCurrentChange(val) {
         // console.log(val);
         this.currentPage = val;
-        if(this.searchNum == '1'){
+        if (this.searchNum == '1') {
           this.search();
-        }else {
+        } else {
           this.getPage();
         }
       },
@@ -1062,9 +1130,9 @@
       handleSizeChange(val) {
         // console.log(val);
         this.pageSize = val;
-        if(this.searchNum == '1'){
+        if (this.searchNum == '1') {
           this.search();
-        }else {
+        } else {
           this.getPage();
         }
       },
@@ -1080,7 +1148,7 @@
         this.addObject.nContent = html;
         this.addObject.nContents = text;
       },
-      signOut(){
+      signOut() {
         this.$message({
           type: 'error',
           message: '登录失效，请重新登录!'
@@ -1090,12 +1158,14 @@
         storage.delete('auth');
         storage.delete('token');
         storage.delete('sysid');
-        this.$router.push({name:'login'});
+        this.$router.push({name: 'login'});
       }
     },
     created() {
       this.classify();
       this.getPage();
+      this.getUser();
+      this.getTem();
     },
     mounted() {
 
@@ -1108,17 +1178,25 @@
   }
 </script>
 <style>
-  .assign-detail-dialog  .el-dialog {
-    width: 600px !important;
-    position: relative;
+  .assign-detail-dialog {
+    font-weight: bold !important;
   }
-  .assign-detail-dialog  .el-dialog .pop-content {
+  .assign-detail-dialog .el-dialog__header {
+    padding: 20px 20px 10px !important;
+    border-bottom: none  !important;
+  }
+
+  .assign-detail-dialog .el-dialog__header span {
+    font-size: 14px;
+  }
+  .assign-detail-dialog .pop-content {
     text-align: left;
     overflow-y: auto;
     height: 100%;
     width: 100%;
   }
-  .assign-detail-dialog  .el-dialog .pop-content .role-cell {
+
+  .assign-detail-dialog .pop-content .role-cell {
     float: left;
     height: auto;
     margin: 0 1%;
@@ -1126,29 +1204,38 @@
     box-sizing: border-box;
     border-right: 1px solid #ccc;
   }
-  .assign-detail-dialog  .el-dialog .pop-content .role-cell:last-child {
+
+  .assign-detail-dialog .pop-content .role-cell:last-child {
     border-right: none;
   }
-  .assign-detail-dialog  .el-dialog .pop-content .role-cell-content {
-     margin-top: 20px;
-   }
-  .assign-detail-dialog  .el-dialog .pop-content .role-cell-content .user {
-    height: 30px;
-    cursor: pointer;
-    line-height: 30px;
+
+  .assign-detail-dialog  .pop-content .role-cell-content {
+    margin-top: 20px;
+    max-height: 400px;
+    height: 400px;
+    overflow: auto;
   }
-  .assign-detail-dialog  .el-dialog .el-dialog__body {
+
+  .assign-detail-dialog  .pop-content .role-cell-content .user {
+    height: 35px;
+    cursor: pointer;
+    line-height: 35px;
+  }
+
+  .assign-detail-dialog .el-dialog .el-dialog__body {
     height: 500px;
     overflow: hidden;
   }
-  .assign-detail-dialog  .el-dialog .el-dialog__footer {
+
+  .assign-detail-dialog .el-dialog .el-dialog__footer {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
   }
+
   .assign-detail-dialog .el-dialog .dialog-footer .el-button:nth-of-type(2) {
-    margin-left: 0!important;
+    margin-left: 0 !important;
   }
 
 </style>
