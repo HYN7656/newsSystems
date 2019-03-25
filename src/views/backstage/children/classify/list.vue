@@ -30,12 +30,11 @@
         </el-table-column>
         <el-table-column
           prop="pname"
-          label="上级分类">
+          label="类别">
         </el-table-column>
         <el-table-column
           prop="iCreateTime"
           label="创建时间"
-          :formatter="gstime"
           width="220">
         </el-table-column>
         <el-table-column
@@ -64,18 +63,18 @@
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="100px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
-          <el-form-item label="上级分类：">
-            <el-select v-model="addObject.iPid" placeholder="请选择" style="width: 100%" @change="ChoicePidAdd">
+          <el-form-item label="类别：">
+            <el-select v-model="addObject.iType" placeholder="请选择" style="width: 100%">
               <el-option
-                v-for="item in treeListP"
+                v-for="item in option"
                 :key="item.id"
-                :label="item.iName"
+                :label="item.name"
                 :value="item.id">
               </el-option>
             </el-select>
           </el-form-item>
         </div>
-        <div class="cell" v-show="AddtypeShow">
+       <!-- <div class="cell" v-show="AddtypeShow">
           <el-form-item label="类别：">
             <el-select v-model="addObject.iType" placeholder="请选择" style="width: 100%" >
               <el-option
@@ -86,9 +85,9 @@
               </el-option>
             </el-select>
           </el-form-item>
-        </div>
+        </div>-->
         <div class="cell">
-          <el-form-item label="分类：" prop="iName">
+          <el-form-item label="分类名称：" prop="iName">
             <!--<span class="name">分类：</span>-->
             <el-input v-model="addObject.iName" placeholder="请输入内容" class="flew-input"></el-input>
           </el-form-item>
@@ -105,12 +104,12 @@
       <el-form :model="editObject" status-icon :rules="rules" ref="editObject" label-width="100px" class="demo-ruleForm">
       <div class="content">
         <div class="cell">
-          <el-form-item label="上级分类：" v-show="EdittypeShow">
-            <el-select v-model="editObject.iPid" placeholder="请选择" style="width: 100%">
+          <el-form-item label="类别：">
+            <el-select v-model="editPname" placeholder="请选择" style="width: 100%">
               <el-option
-                v-for="item in treeListP"
+                v-for="item in option"
                 :key="item.id"
-                :label="item.iName"
+                :label="item.name"
                 :value="item.id">
               </el-option>
             </el-select>
@@ -129,7 +128,7 @@
           </el-form-item>
         </div>-->
         <div class="cell">
-          <el-form-item label="分类：" prop="iName">
+          <el-form-item label="分类名称：" prop="iName">
           <!--<span class="name">分类：</span>-->
           <el-input v-model="editObject.iName" placeholder="请输入内容" class="flew-input"></el-input>
           </el-form-item>
@@ -160,16 +159,18 @@
         multipleSelection: [],
         activeTableDataId: [],
         activeTableDataId2: '',
+        option:[],
         addObject: {
           iName: '',
-          iPid : '',
+          // iPid : '',
           iType : ''
         },
         editObject: {
           iName: '',
-          iPid : '',
+          // iPid : '',
           iType: ''
         },
+        editPname:'',
         tableData: [],
         rules: {
           iName: [
@@ -177,34 +178,12 @@
             { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
           ]
         },
-        treeListP:[],
+        // treeListP:[],
         currentPage: 1,
         pageSize: 10,
         total: 0,
-        option:[
-          {
-            id : 1,
-            name : "公告管理"
-          },
-          {
-            id : 2,
-            name : "空域规划"
-          },
-          {
-            id : 3,
-            name : "空域管理"
-          },
-          {
-            id : 4,
-            name : "程序设计"
-          },
-          {
-            id : 5,
-            name : "节能减排"
-          },
-        ],
-        AddtypeShow : false,
-        EdittypeShow : false
+        // AddtypeShow : false,
+        // EdittypeShow : false
       }
     },
     computed: {},
@@ -216,8 +195,10 @@
         params['count'] = this.pageSize;
         API.get('/ification/FindAll', params,{Authorization:storage.get('token')}).then((res) => {
           if (res.data.code == 200) {
+            this.tableData = res.data.data;
+            this.total = res.data.count;
             // console.log(res.data);
-            var arr = res.data.data.ificationList;
+            /*var arr = res.data.data.ificationList;
             var arr2 = [];
             this.tableData = arr2.concat(arr);
             this.tableData.pop();
@@ -226,7 +207,7 @@
               if(typeof arr[i] != 'object'){
                 this.total = arr[i];
               }
-            }
+            }*/
           } else if(res.data.code == 1001){
             this.signOut();
           } else {
@@ -234,10 +215,19 @@
           }
         })
       },
-      // 格式化创建时间
-      gstime(val){
-        // console.log(val);
-        return val.iCreateTime.substr(0,10);
+      // 类别初始化
+      getClassify(){
+        let params = {};
+        API.get('/ification/typeAll', params,{Authorization:storage.get('token')}).then((res) => {
+          if (res.data.code == 200) {
+            // console.log(res.data);
+            this.option = res.data.data
+          } else if(res.data.code == 1001){
+            this.signOut();
+          } else {
+            console.log(res.data);
+          }
+        })
       },
       // 新增
       addOpen() {
@@ -245,28 +235,12 @@
         this.loadingBtn = false;
         this.addObject = {
           iName: '',
-          iPid : '',
           iType : ''
         }
-        this.AddtypeShow = false;
         if(this.$refs.addObject){
           this.$refs.addObject.clearValidate();
         }else {
           return;
-        }
-      },
-      ChoicePidAdd(){
-        if(this.addObject.iPid){
-          this.AddtypeShow = true;
-        }else {
-          this.AddtypeShow = false;
-        }
-      },
-      ChoicePidEdit(){
-        if(this.editObject.iPid){
-          this.EdittypeShow = true;
-        }else {
-          this.EdittypeShow = false;
         }
       },
       // 新增保存
@@ -276,7 +250,7 @@
             this.loadingBtn = true;
             let params = {};
             params['iName'] = this.addObject.iName;
-            params['iPid'] = this.addObject.iPid;
+            // params['iPid'] = this.addObject.iPid;
             params['iType'] = this.addObject.iType;
             params['iSystemId'] = storage.get('sysid');
             // console.log(params);
@@ -292,6 +266,7 @@
               } else if(res.data.code == 1001){
                 this.signOut();
               } else {
+                this.loadingBtn = false;
                 this.$message({
                   type: 'error',
                   message: '新增失败!'+ res.data.message
@@ -308,10 +283,9 @@
         }
         this.editPop = true;
         this.loadingBtn = false;
-        this.EdittypeShow = false;
         this.editObject = {
           iName: '',
-          iPid : '',
+          // iPid : '',
           iType : ''
         }
         let params = {};
@@ -319,14 +293,8 @@
         API.get('/ification/FindByid', params,{Authorization:storage.get('token')}).then((res) => {
           // console.log(res.data);
           if (res.data.code == 200) {
-            if(res.data.data.classIfication.iPid == 0){
-              this.editObject = res.data.data.classIfication;
-              this.editObject.iPid = '';
-              this.EdittypeShow = false;
-            }else {
-              this.editObject = res.data.data.classIfication;
-              this.EdittypeShow = true;
-            }
+            this.editObject = res.data.data.classIfication;
+            this.editPname = res.data.data.pname;
           } else if(res.data.code == 1001){
             this.signOut();
           } else {
@@ -343,9 +311,10 @@
             let params = {};
             params['id'] = this.editObject.id;
             params['iName'] = this.editObject.iName;
-            params['iPid'] = this.editObject.iPid;
-            params['iType'] = this.editObject.iType;
+            // params['iPid'] = this.editObject.iPid;
+            params['iType'] = this.editPname;
             params['iSystemId'] = storage.get('sysid');
+            console.log(params)
             API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
               // console.log(res.data);
               if (res.data.code == 200) {
@@ -468,6 +437,7 @@
     },
     created() {
       this.getPage();
+      this.getClassify();
     }
 
   }
