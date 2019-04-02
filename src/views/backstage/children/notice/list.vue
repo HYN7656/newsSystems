@@ -184,7 +184,7 @@
       </el-dialog>
       <div class="content">
         <div class="cell">
-          <span class="name" style="line-height: 20px">短信内容：</span>
+          <span class="name" style="line-height: 20px"> <span style="color: red">*</span>短信内容：</span>
           <el-input
             type="textarea"
             :rows="5"
@@ -195,7 +195,7 @@
           <span class="btn" @click="modelbox">模板</span>
         </div>
         <div class="cell">
-          <span class="name">相关用户：</span>
+          <span class="name"><span style="color: red">*</span>相关用户：</span>
           <el-input v-model="MsgUserInp" placeholder="请输入内容" class="flew-input input-user" disabled></el-input>
           <span class="btn" @click="userPop = true">选择</span>
         </div>
@@ -206,7 +206,7 @@
       </div>
     </el-dialog>
     <!--添加弹框-->
-    <el-dialog title="添加公告" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加动态" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <el-form :model="addObject" status-icon :rules="rules" ref="addObject" label-width="80px" class="demo-ruleForm">
         <div class="content">
           <div class="cell">
@@ -507,28 +507,35 @@
       // 短信保存
       MesSave() {
         if(this.MsgUserInpPhone.length>0){
-          let params = {};
-          // params["userId"] = this.MsgUserInpId;
-          params["Content"] = this.MsgText;
-          params["phone"] = this.MsgUserInpPhone;
-          params["type"] = 4;
-          // console.log(params)
-          API.post("/notice/sendMessage", params, {
-            Authorization: storage.get("token")
-          }).then(res => {
-            // console.log(res.data)
-            if (res.data.code == 200) {
-              this.$message({
-                type: 'success',
-                message: '发送成功！'
-              });
-              this.tipPop = false;
-            } else if (res.data.code == 1001) {
-              this.signOut();
-            } else {
-              console.log(res.data.data.message);
-            }
-          });
+          if(!this.MsgText){
+            this.$message({
+              type: 'error',
+              message: '必须有短信内容！'
+            });
+          }else {
+            let params = {};
+            // params["userId"] = this.MsgUserInpId;
+            params["Content"] = this.MsgText;
+            params["phone"] = this.MsgUserInpPhone;
+            params["type"] = 4;
+            // console.log(params)
+            API.post("/notice/sendMessage", params, {
+              Authorization: storage.get("token")
+            }).then(res => {
+              // console.log(res.data)
+              if (res.data.code == 200) {
+                this.$message({
+                  type: 'success',
+                  message: '发送成功！'
+                });
+                this.tipPop = false;
+              } else if (res.data.code == 1001) {
+                this.signOut();
+              } else {
+                console.log(res.data.data.message);
+              }
+            });
+          }
         }else {
           this.$message({
             type: 'error',

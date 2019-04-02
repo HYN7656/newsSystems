@@ -105,7 +105,7 @@
       <div class="content">
         <div class="cell">
           <el-form-item label="类别：">
-            <el-select v-model="editPname" placeholder="请选择" style="width: 100%">
+            <el-select v-model="editObject.iType" placeholder="请选择" style="width: 100%">
               <el-option
                 v-for="item in option"
                 :key="item.id"
@@ -312,7 +312,7 @@
             params['id'] = this.editObject.id;
             params['iName'] = this.editObject.iName;
             // params['iPid'] = this.editObject.iPid;
-            params['iType'] = this.editPname;
+            params['iType'] = this.editObject.iType;
             params['iSystemId'] = storage.get('sysid');
             console.log(params)
             API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
@@ -331,6 +331,7 @@
                   type: 'error',
                   message: '编辑失败!'+ res.data.message
                 });
+                this.loadingBtn = false;
               }
             });
           }

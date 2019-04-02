@@ -1217,6 +1217,9 @@
 .bz .el-form-item__label {
   padding-left: 5px;
 }
+.backstage-meeting-page .tip-dialog .el-dialog .el-dialog__footer {
+  padding-top: 80px!important;
+}
 </style>
 
 <style lang="less">

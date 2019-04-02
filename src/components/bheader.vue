@@ -36,7 +36,7 @@
             <li v-show="noticeS">
               <router-link :to="{name:'backstage.notice'}" class="left-c"
                            :class="{active: $route.name == 'backstage.notice'||$route.name == 'backstage.notice.detail'}"><i
-                class="icon iconfont icon-gonggao"></i>公告管理
+                class="icon iconfont icon-gonggao"></i>动态管理
               </router-link>
             </li>
             <li v-show="meetingS">
