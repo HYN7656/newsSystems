@@ -18,7 +18,7 @@
     <br/>
     <div class="inner-c detail-table">
       <div class="info">
-        <div class="img"><img class="ewm pic" src="../../../../assets/images/erwm.png"></div>
+        <div class="img"><img class="ewm pic" :src="url"></div>
         <div class="detail">
           <div class="title">{{datail.mName}}</div>
           <div class="time"><i class="icon iconfont icon-shijian"></i>{{datail.startTime}} -- {{datail.endTime}}</div>
@@ -113,7 +113,8 @@
           partakeHost : [],
           partakeCompany : [],
           file:[],
-          active:1
+          active:1,
+          url:''
         }
       },
       mounted: function () {
@@ -126,6 +127,7 @@
           API.get('/meeTing/FindById', params,{Authorization:storage.get('token')}).then((res) => {
             // console.log(res.data);
             if(res.data.code == 200) {
+              this.url = config.baseURL + res.data.data.data.mQrcodeUrl;
               this.file = res.data.data.file;
               for(var i=0;i<this.file.length;i++){
                 this.file[i].url = config.baseURL + this.file[i].fenclUrl;
