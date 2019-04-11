@@ -105,7 +105,7 @@
       <div class="content">
         <div class="cell">
           <el-form-item label="类别：">
-            <el-select v-model="editObject.iType" placeholder="请选择" style="width: 100%">
+            <el-select v-model="editPname" placeholder="请选择" style="width: 100%" @change="editChang" >
               <el-option
                 v-for="item in option"
                 :key="item.id"
@@ -171,6 +171,7 @@
           iType: ''
         },
         editPname:'',
+        editPnameId:'',
         tableData: [],
         rules: {
           iName: [
@@ -295,6 +296,7 @@
           if (res.data.code == 200) {
             this.editObject = res.data.data.classIfication;
             this.editPname = res.data.data.pname;
+            this.editPnameId = this.editObject.iType;
           } else if(res.data.code == 1001){
             this.signOut();
           } else {
@@ -302,17 +304,20 @@
           }
         })
       },
+      editChang(){
+        this.editPnameId = this.editPname;
+      },
       // 编辑保存
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.loadingBtn = true;
-            // console.log(this.editObject);
+            // console.log(this.editPnameId)
             let params = {};
             params['id'] = this.editObject.id;
             params['iName'] = this.editObject.iName;
-            // params['iPid'] = this.editObject.iPid;
-            params['iType'] = this.editObject.iType;
+            params['iPid'] = this.editObject.iPid;
+            params['iType'] =this.editPnameId;
             params['iSystemId'] = storage.get('sysid');
             console.log(params)
             API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
