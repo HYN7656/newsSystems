@@ -183,6 +183,8 @@
         currentPage: 1,
         pageSize: 10,
         total: 0,
+        EditName:'',
+        num:0,
         // AddtypeShow : false,
         // EdittypeShow : false
       }
@@ -234,6 +236,7 @@
       addOpen() {
         this.addPop = true;
         this.loadingBtn = false;
+        this.num = 0;
         this.addObject = {
           iName: '',
           iType : ''
@@ -248,32 +251,39 @@
       addSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            let params = {};
-            params['iName'] = this.addObject.iName;
-            // params['iPid'] = this.addObject.iPid;
-            params['iType'] = this.addObject.iType;
-            params['iSystemId'] = storage.get('sysid');
-            // console.log(params);
-            API.post('/ification/create', params,{Authorization:storage.get('token')}).then((res) => {
-              // console.log(res.data)
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              } else if(res.data.code == 1001){
-                this.signOut();
-              } else {
-                this.loadingBtn = false;
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'+ res.data.message
-                });
-              }
-            });
+            this.num ++;
+            if(this.num == 1){
+              this.loadingBtn = true;
+              let params = {};
+              params['iName'] = this.addObject.iName;
+              // params['iPid'] = this.addObject.iPid;
+              params['iType'] = this.addObject.iType;
+              params['iSystemId'] = storage.get('sysid');
+              // console.log(params);
+              API.post('/ification/create', params,{Authorization:storage.get('token')}).then((res) => {
+                // console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if(res.data.code == 1001){
+                  this.signOut();
+                } else {
+                  this.loadingBtn = false;
+                  this.num = 0;
+                  this.$message({
+                    type: 'error',
+                    message: '新增失败!'+ res.data.message
+                  });
+                }
+              });
+            }else {
+              return;
+            }
+
           }
         });
       },
@@ -289,12 +299,14 @@
           // iPid : '',
           iType : ''
         }
+        this.num = 0;
         let params = {};
         params['id'] = id;
         API.get('/ification/FindByid', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data);
+          console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.classIfication;
+            this.EditName = res.data.data.classIfication.iName;
             this.editPname = res.data.data.pname;
             this.editPnameId = this.editObject.iType;
           } else if(res.data.code == 1001){
@@ -311,34 +323,94 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.loadingBtn = true;
-            // console.log(this.editPnameId)
-            let params = {};
-            params['id'] = this.editObject.id;
-            params['iName'] = this.editObject.iName;
-            params['iPid'] = this.editObject.iPid;
-            params['iType'] =this.editPnameId;
-            params['iSystemId'] = storage.get('sysid');
-            console.log(params)
-            API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
-              // console.log(res.data);
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
+            if(this.EditName == this.editObject.iName){
+              this.num ++;
+              if(this.num == 1){
+                this.loadingBtn = true;
+                // console.log(this.editPnameId)
+                let params = {};
+                params['id'] = this.editObject.id;
+                params['iName'] = this.editObject.iName;
+                params['iPid'] = this.editObject.iPid;
+                params['iType'] =this.editPnameId;
+                params['iSystemId'] = storage.get('sysid');
+                console.log(params)
+                API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+                  // console.log(res.data);
+                  if (res.data.code == 200) {
+                    this.editPop = false;
+                    this.getPage();
+                    this.$message({
+                      type: 'success',
+                      message: '编辑成功!'
+                    });
+                  } else if(res.data.code == 1001){
+                    this.signOut();
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '编辑失败!'+ res.data.message
+                    });
+                    this.loadingBtn = false;
+                    this.num = 0;
+                  }
                 });
-              } else if(res.data.code == 1001){
-                this.signOut();
-              } else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'+ res.data.message
-                });
-                this.loadingBtn = false;
+              }else {
+                return
               }
-            });
+            }else {
+              let tit = {};
+              tit['iName'] = this.editObject.iName;
+              API.get('/ification/findByName', tit, {Authorization: storage.get('token')}).then((res) => {
+                if (res.data.code == 200) {
+                  this.num ++;
+                  if(this.num == 1){
+                    this.loadingBtn = true;
+                    // console.log(this.editPnameId)
+                    let params = {};
+                    params['id'] = this.editObject.id;
+                    params['iName'] = this.editObject.iName;
+                    params['iPid'] = this.editObject.iPid;
+                    params['iType'] =this.editPnameId;
+                    params['iSystemId'] = storage.get('sysid');
+                    console.log(params)
+                    API.post('/ification/ificatUpdate', params,{Authorization:storage.get('token')}).then((res) => {
+                      // console.log(res.data);
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getPage();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if(res.data.code == 1001){
+                        this.signOut();
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!'+ res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    });
+                  }else {
+                    return
+                  }
+                } else if (res.data.code == 1001) {
+                  this.signOut();
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!' + res.data.message
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                }
+              })
+            }
+
+
           }
         });
       },

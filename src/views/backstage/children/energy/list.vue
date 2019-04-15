@@ -366,7 +366,8 @@
         tableData: [],
         top : 0,
         num : 0,
-        searchNum:0
+        searchNum:0,
+        EditName:''
       }
     },
     computed: {},
@@ -567,6 +568,7 @@
           // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
+            this.EditName = res.data.data.data.title;
             // 上传列表
             this.EditfileList = res.data.data.file;
             var obj = [];
@@ -585,61 +587,135 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.num ++;
-            if(this.num == 1) {
-              this.loadingBtn = true;
-              // 上传部分
-              var arr = [];
-              var arr2 = [];
-              for (var i = 0; i < this.EditfileList.length; i++) {
-                if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                  arr.push(this.EditfileList[i].response.data.revealImage);
-                  arr2.push(this.EditfileList[i].response.data.imageName);
-                } else {
-                  arr.push(this.EditfileList[i].url);
-                  arr2.push(this.EditfileList[i].name);
+            if(this.EditName == this.editObject.title){
+              this.num ++;
+              if(this.num == 1) {
+                this.loadingBtn = true;
+                // 上传部分
+                var arr = [];
+                var arr2 = [];
+                for (var i = 0; i < this.EditfileList.length; i++) {
+                  if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                    arr.push(this.EditfileList[i].response.data.revealImage);
+                    arr2.push(this.EditfileList[i].response.data.imageName);
+                  } else {
+                    arr.push(this.EditfileList[i].url);
+                    arr2.push(this.EditfileList[i].name);
+                  }
                 }
-              }
-              this.editObject.enclUrl = arr.join(',');
-              this.editObject.enclName = arr2.join(',');
-              let params = {};
-              params['id'] = this.editObject.id;
-              params['title'] = this.editObject.title;
-              params['content'] = this.editObject.content;
-              if(this.editObject.contents){
-                params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+                this.editObject.enclUrl = arr.join(',');
+                this.editObject.enclName = arr2.join(',');
+                let params = {};
+                params['id'] = this.editObject.id;
+                params['title'] = this.editObject.title;
+                params['content'] = this.editObject.content;
+                if(this.editObject.contents){
+                  params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+                }else {
+                  params['contents'] = '';
+                }
+                params['iId'] = this.editObject.iId;
+                params['enclUrl'] = this.editObject.enclUrl;
+                params['enclName'] = this.editObject.enclName;
+                params['author'] = this.editObject.author;
+                params['eFrom'] = this.editObject.eFrom;
+                params['systemId'] = storage.get('sysid');
+                // console.log(params)
+                API.post('/energy/update', params,{Authorization:storage.get('token')}).then((res) => {
+                  if (res.data.code == 200) {
+                    this.editPop = false;
+                    this.getPage();
+                    this.$message({
+                      type: 'success',
+                      message: '编辑成功!'
+                    });
+                  } else if(res.data.code == 1001){
+                    this.signOut();
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '编辑失败!'+ res.data.message
+                    });
+                    this.loadingBtn = false;
+                    this.num = 0;
+                  }
+                });
               }else {
-                params['contents'] = '';
+                return;
               }
-              params['iId'] = this.editObject.iId;
-              params['enclUrl'] = this.editObject.enclUrl;
-              params['enclName'] = this.editObject.enclName;
-              params['author'] = this.editObject.author;
-              params['eFrom'] = this.editObject.eFrom;
-              params['systemId'] = storage.get('sysid');
-              // console.log(params)
-              API.post('/energy/update', params,{Authorization:storage.get('token')}).then((res) => {
+            }else {
+              let tit = {};
+              tit['title'] = this.editObject.title;
+              API.get('/energy/findByTitle', tit, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
-                  this.editPop = false;
-                  this.getPage();
-                  this.$message({
-                    type: 'success',
-                    message: '编辑成功!'
-                  });
-                } else if(res.data.code == 1001){
+                  this.num ++;
+                  if(this.num == 1) {
+                    this.loadingBtn = true;
+                    // 上传部分
+                    var arr = [];
+                    var arr2 = [];
+                    for (var i = 0; i < this.EditfileList.length; i++) {
+                      if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                        arr.push(this.EditfileList[i].response.data.revealImage);
+                        arr2.push(this.EditfileList[i].response.data.imageName);
+                      } else {
+                        arr.push(this.EditfileList[i].url);
+                        arr2.push(this.EditfileList[i].name);
+                      }
+                    }
+                    this.editObject.enclUrl = arr.join(',');
+                    this.editObject.enclName = arr2.join(',');
+                    let params = {};
+                    params['id'] = this.editObject.id;
+                    params['title'] = this.editObject.title;
+                    params['content'] = this.editObject.content;
+                    if(this.editObject.contents){
+                      params['contents'] = this.editObject.contents.replace(/[\r\n]/g, "");
+                    }else {
+                      params['contents'] = '';
+                    }
+                    params['iId'] = this.editObject.iId;
+                    params['enclUrl'] = this.editObject.enclUrl;
+                    params['enclName'] = this.editObject.enclName;
+                    params['author'] = this.editObject.author;
+                    params['eFrom'] = this.editObject.eFrom;
+                    params['systemId'] = storage.get('sysid');
+                    // console.log(params)
+                    API.post('/energy/update', params,{Authorization:storage.get('token')}).then((res) => {
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getPage();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if(res.data.code == 1001){
+                        this.signOut();
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!'+ res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    });
+                  }else {
+                    return;
+                  }
+                } else if (res.data.code == 1001) {
                   this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
-                    message: '编辑失败!'+ res.data.message
+                    message: '编辑失败!' + res.data.message
                   });
                   this.loadingBtn = false;
                   this.num = 0;
                 }
-              });
-            }else {
-              return;
+              })
             }
+
           }
         })
       },

@@ -489,7 +489,8 @@
           theme: 'snow'
         },
         num: 0,
-        searchNum: 0
+        searchNum: 0,
+        EditName:''
       }
     },
     methods: {
@@ -848,6 +849,7 @@
           // console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
+            this.EditName = res.data.data.data.nTitle;
             // this.editObject.nImgUrl = config.baseURL + res.data.data.data.nImgUrl;
             // console.log(this.editObject.nImgUrl)
             // this.editObject.nurl = this.editObject.nImgUrl;
@@ -869,56 +871,140 @@
       editSave(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.num++;
-            if (this.num == 1) {
-              this.loadingBtn = true;
-              // 上传部分
-              var arr = [];
-              var arr2 = [];
-              for (var i = 0; i < this.EditfileList.length; i++) {
-                if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                  arr.push(this.EditfileList[i].response.data.revealImage);
-                  arr2.push(this.EditfileList[i].response.data.imageName);
+            if(this.EditName == this.editObject.nTitle){
+              this.num++;
+              if (this.num == 1) {
+                this.loadingBtn = true;
+                // 上传部分
+                var arr = [];
+                var arr2 = [];
+                for (var i = 0; i < this.EditfileList.length; i++) {
+                  if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                    arr.push(this.EditfileList[i].response.data.revealImage);
+                    arr2.push(this.EditfileList[i].response.data.imageName);
+                  } else {
+                    arr.push(this.EditfileList[i].url);
+                    arr2.push(this.EditfileList[i].name);
+                  }
+                }
+                this.editObject.nEnclUrl = arr.join(',');
+                this.editObject.nEnclName = arr2.join(',');
+
+                function find(str, cha, num) {
+                  var x = str.indexOf(cha);
+                  for (var i = 0; i < num - 1; i++) {
+                    x = str.indexOf(cha, x + 1);
+                  }
+                  return x;
+                }
+
+                let params = {};
+                params['id'] = this.editObject.id;
+                params['nTitle'] = this.editObject.nTitle;
+                params['nContent'] = this.editObject.nContent;
+                if (this.editObject.nContents) {
+                  params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
                 } else {
-                  arr.push(this.EditfileList[i].url);
-                  arr2.push(this.EditfileList[i].name);
+                  params['nContents'] = '';
                 }
-              }
-              this.editObject.nEnclUrl = arr.join(',');
-              this.editObject.nEnclName = arr2.join(',');
-
-              function find(str, cha, num) {
-                var x = str.indexOf(cha);
-                for (var i = 0; i < num - 1; i++) {
-                  x = str.indexOf(cha, x + 1);
-                }
-                return x;
-              }
-
-              let params = {};
-              params['id'] = this.editObject.id;
-              params['nTitle'] = this.editObject.nTitle;
-              params['nContent'] = this.editObject.nContent;
-              if (this.editObject.nContents) {
-                params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+                params['nAuthor'] = this.editObject.nAuthor;
+                params['nFrom'] = this.editObject.nFrom;
+                params['nEnclUrl'] = this.editObject.nEnclUrl;
+                params['nEnclName'] = this.editObject.nEnclName;
+                params['iId'] = this.editObject.iId;
+                params['nSystemId'] = storage.get('sysid');
+                // console.log(params);
+                API.post('/notice/noticeUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+                  if (res.data.code == 200) {
+                    this.editPop = false;
+                    this.getPage();
+                    this.$message({
+                      type: 'success',
+                      message: '编辑成功!'
+                    });
+                  } else if (res.data.code == 1001) {
+                    this.signOut();
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '编辑失败!' + res.data.message
+                    });
+                    this.loadingBtn = false;
+                    this.num = 0;
+                  }
+                })
               } else {
-                params['nContents'] = '';
+                return;
               }
-              params['nAuthor'] = this.editObject.nAuthor;
-              params['nFrom'] = this.editObject.nFrom;
-              params['nEnclUrl'] = this.editObject.nEnclUrl;
-              params['nEnclName'] = this.editObject.nEnclName;
-              params['iId'] = this.editObject.iId;
-              params['nSystemId'] = storage.get('sysid');
-              // console.log(params);
-              API.post('/notice/noticeUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+            }else {
+              let tit = {};
+              tit['nName'] = this.editObject.nTitle;
+              API.get('/notice/findByName', tit, {Authorization: storage.get('token')}).then((res) => {
                 if (res.data.code == 200) {
-                  this.editPop = false;
-                  this.getPage();
-                  this.$message({
-                    type: 'success',
-                    message: '编辑成功!'
-                  });
+                  this.num++;
+                  if (this.num == 1) {
+                    this.loadingBtn = true;
+                    // 上传部分
+                    var arr = [];
+                    var arr2 = [];
+                    for (var i = 0; i < this.EditfileList.length; i++) {
+                      if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                        arr.push(this.EditfileList[i].response.data.revealImage);
+                        arr2.push(this.EditfileList[i].response.data.imageName);
+                      } else {
+                        arr.push(this.EditfileList[i].url);
+                        arr2.push(this.EditfileList[i].name);
+                      }
+                    }
+                    this.editObject.nEnclUrl = arr.join(',');
+                    this.editObject.nEnclName = arr2.join(',');
+
+                    function find(str, cha, num) {
+                      var x = str.indexOf(cha);
+                      for (var i = 0; i < num - 1; i++) {
+                        x = str.indexOf(cha, x + 1);
+                      }
+                      return x;
+                    }
+
+                    let params = {};
+                    params['id'] = this.editObject.id;
+                    params['nTitle'] = this.editObject.nTitle;
+                    params['nContent'] = this.editObject.nContent;
+                    if (this.editObject.nContents) {
+                      params['nContents'] = this.editObject.nContents.replace(/[\r\n]/g, "");
+                    } else {
+                      params['nContents'] = '';
+                    }
+                    params['nAuthor'] = this.editObject.nAuthor;
+                    params['nFrom'] = this.editObject.nFrom;
+                    params['nEnclUrl'] = this.editObject.nEnclUrl;
+                    params['nEnclName'] = this.editObject.nEnclName;
+                    params['iId'] = this.editObject.iId;
+                    params['nSystemId'] = storage.get('sysid');
+                    // console.log(params);
+                    API.post('/notice/noticeUpdate', params, {Authorization: storage.get('token')}).then((res) => {
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getPage();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if (res.data.code == 1001) {
+                        this.signOut();
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!' + res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    })
+                  } else {
+                    return;
+                  }
                 } else if (res.data.code == 1001) {
                   this.signOut();
                 } else {
@@ -930,9 +1016,8 @@
                   this.num = 0;
                 }
               })
-            } else {
-              return;
             }
+
           }
         });
       },

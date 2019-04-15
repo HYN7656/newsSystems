@@ -581,7 +581,8 @@
           }]
         },
         num:0,
-        searchNum:0
+        searchNum:0,
+        EditName:'',
 
       }
     },
@@ -782,9 +783,10 @@
         params['id'] = id;
         // console.log(params);
         API.get('/meeTing/FindById', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data);
+          console.log(res.data);
           if (res.data.code == 200) {
             this.editObject = res.data.data.data;
+            this.EditName = res.data.data.data.mName;
             if(!this.editObject.mHostUnit){
               this.editObject.mHostUnit = [];
             }else {
@@ -830,66 +832,145 @@
         }else {
           this.$refs[formName].validate((valid) => {
             if (valid) {
-              this.num ++;
-              if(this.num == 1) {
-                this.loadingBtn = true;
-                // 上传部分
-                var arr = [];
-                var arr2 = [];
-                for (var i = 0; i < this.EditfileList.length; i++) {
-                  if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
-                    arr.push(this.EditfileList[i].response.data.revealImage);
-                    arr2.push(this.EditfileList[i].response.data.imageName);
-                  } else {
-                    arr.push(this.EditfileList[i].url);
-                    arr2.push(this.EditfileList[i].name);
+              if(this.EditName == this.editObject.mName){
+                this.num ++;
+                if(this.num == 1) {
+                  this.loadingBtn = true;
+                  // 上传部分
+                  var arr = [];
+                  var arr2 = [];
+                  for (var i = 0; i < this.EditfileList.length; i++) {
+                    if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                      arr.push(this.EditfileList[i].response.data.revealImage);
+                      arr2.push(this.EditfileList[i].response.data.imageName);
+                    } else {
+                      arr.push(this.EditfileList[i].url);
+                      arr2.push(this.EditfileList[i].name);
+                    }
                   }
-                }
-                this.editObject.mEnclUrl = arr.join(',');
-                this.editObject.mEnclName = arr2.join(',');
-                let params = {};
-                params['id'] = this.editObject.id;
-                params['mName'] = this.editObject.mName;
-                params['mStartTime'] = this.EditData[0];
-                params['mEndTime'] = this.EditData[1];
-                params['mAddress'] = this.editObject.mAddress;
-                params['mBrief'] = this.editObject.mBrief;
-                params['mContacts'] = this.editObject.mContacts;
-                params['mWechat'] = this.editObject.mWechat;
-                params['mPhone'] = this.editObject.mPhone;
-                params['mHostUnit'] = this.editObject.mHostUnit.join(",");
-                params['mParticipatingUnits'] = this.editObject.mParticipatingUnits.join(",");
-                params['mRemarks'] = this.editObject.mRemarks;
-                params['mEnclUrl'] = this.editObject.mEnclUrl;
-                params['mEnclName'] = this.editObject.mEnclName;
-                params['mContent'] = this.editObject.mContent;
-                params['mContents'] = this.editObject.mContents.replace(/[\r\n]/g, "");
-                params['mSystemId'] = storage.get('sysid');
+                  this.editObject.mEnclUrl = arr.join(',');
+                  this.editObject.mEnclName = arr2.join(',');
+                  let params = {};
+                  params['id'] = this.editObject.id;
+                  params['mName'] = this.editObject.mName;
+                  params['mStartTime'] = this.EditData[0];
+                  params['mEndTime'] = this.EditData[1];
+                  params['mAddress'] = this.editObject.mAddress;
+                  params['mBrief'] = this.editObject.mBrief;
+                  params['mContacts'] = this.editObject.mContacts;
+                  params['mWechat'] = this.editObject.mWechat;
+                  params['mPhone'] = this.editObject.mPhone;
+                  params['mHostUnit'] = this.editObject.mHostUnit.join(",");
+                  params['mParticipatingUnits'] = this.editObject.mParticipatingUnits.join(",");
+                  params['mRemarks'] = this.editObject.mRemarks;
+                  params['mEnclUrl'] = this.editObject.mEnclUrl;
+                  params['mEnclName'] = this.editObject.mEnclName;
+                  params['mContent'] = this.editObject.mContent;
+                  params['mContents'] = this.editObject.mContents.replace(/[\r\n]/g, "");
+                  params['mSystemId'] = storage.get('sysid');
 
-                // console.log(params);
-                API.post('/meeTing/update', params,{Authorization:storage.get('token')}).then((res) => {
-                  // console.log(res.data);
+                  // console.log(params);
+                  API.post('/meeTing/update', params,{Authorization:storage.get('token')}).then((res) => {
+                    // console.log(res.data);
+                    if (res.data.code == 200) {
+                      this.editPop = false;
+                      this.getPage();
+                      this.$message({
+                        type: 'success',
+                        message: '编辑成功!'
+                      });
+                    } else if(res.data.code == 1001){
+                      this.signOut();
+                    } else {
+                      this.$message({
+                        type: 'error',
+                        message: '编辑失败!'+ res.data.message
+                      });
+                      this.loadingBtn = false;
+                      this.num = 0;
+                    }
+                  });
+                }else{
+                  return;
+                }
+              }else {
+                let tit = {};
+                tit['mName'] = this.editObject.mName;
+                API.get('/meeTing/findName', tit, {Authorization: storage.get('token')}).then((res) => {
                   if (res.data.code == 200) {
-                    this.editPop = false;
-                    this.getPage();
-                    this.$message({
-                      type: 'success',
-                      message: '编辑成功!'
-                    });
-                  } else if(res.data.code == 1001){
+                    this.num ++;
+                    if(this.num == 1) {
+                      this.loadingBtn = true;
+                      // 上传部分
+                      var arr = [];
+                      var arr2 = [];
+                      for (var i = 0; i < this.EditfileList.length; i++) {
+                        if (this.EditfileList[i].response && this.EditfileList[i].response.code == '200') {
+                          arr.push(this.EditfileList[i].response.data.revealImage);
+                          arr2.push(this.EditfileList[i].response.data.imageName);
+                        } else {
+                          arr.push(this.EditfileList[i].url);
+                          arr2.push(this.EditfileList[i].name);
+                        }
+                      }
+                      this.editObject.mEnclUrl = arr.join(',');
+                      this.editObject.mEnclName = arr2.join(',');
+                      let params = {};
+                      params['id'] = this.editObject.id;
+                      params['mName'] = this.editObject.mName;
+                      params['mStartTime'] = this.EditData[0];
+                      params['mEndTime'] = this.EditData[1];
+                      params['mAddress'] = this.editObject.mAddress;
+                      params['mBrief'] = this.editObject.mBrief;
+                      params['mContacts'] = this.editObject.mContacts;
+                      params['mWechat'] = this.editObject.mWechat;
+                      params['mPhone'] = this.editObject.mPhone;
+                      params['mHostUnit'] = this.editObject.mHostUnit.join(",");
+                      params['mParticipatingUnits'] = this.editObject.mParticipatingUnits.join(",");
+                      params['mRemarks'] = this.editObject.mRemarks;
+                      params['mEnclUrl'] = this.editObject.mEnclUrl;
+                      params['mEnclName'] = this.editObject.mEnclName;
+                      params['mContent'] = this.editObject.mContent;
+                      params['mContents'] = this.editObject.mContents.replace(/[\r\n]/g, "");
+                      params['mSystemId'] = storage.get('sysid');
+
+                      // console.log(params);
+                      API.post('/meeTing/update', params,{Authorization:storage.get('token')}).then((res) => {
+                        // console.log(res.data);
+                        if (res.data.code == 200) {
+                          this.editPop = false;
+                          this.getPage();
+                          this.$message({
+                            type: 'success',
+                            message: '编辑成功!'
+                          });
+                        } else if(res.data.code == 1001){
+                          this.signOut();
+                        } else {
+                          this.$message({
+                            type: 'error',
+                            message: '编辑失败!'+ res.data.message
+                          });
+                          this.loadingBtn = false;
+                          this.num = 0;
+                        }
+                      });
+                    }else{
+                      return;
+                    }
+                  } else if (res.data.code == 1001) {
                     this.signOut();
                   } else {
                     this.$message({
                       type: 'error',
-                      message: '编辑失败!'+ res.data.message
+                      message: '编辑失败!' + res.data.message
                     });
                     this.loadingBtn = false;
                     this.num = 0;
                   }
-                });
-              }else{
-                return;
+                })
               }
+
             }
           });
         }
