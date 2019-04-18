@@ -1064,6 +1064,8 @@
           params['nSystemId'] = storage.get('sysid');
           API.delete('/notice/noticeDelete', params, {Authorization: storage.get('token')}).then((res) => {
             if (res.data.code == 200) {
+              this.currentPage = 1;
+              this.pageSize = 10;
               this.getPage();
               this.$message({
                 type: 'success',
@@ -1113,6 +1115,8 @@
                 type: 'success',
                 message: '删除成功!'
               });
+              this.currentPage = 1;
+              this.pageSize = 10;
               this.getPage();
             } else if (res.data.code == 1001) {
               this.signOut();

@@ -105,12 +105,13 @@
       <div class="content">
         <div class="cell">
           <el-form-item label="类别：">
-            <el-select v-model="editPname" placeholder="请选择" style="width: 100%" @change="editChang" >
+            <el-select v-model="editPname" placeholder="请选择" style="width: 100%" @change="editChang" :disabled="true">
               <el-option
                 v-for="item in option"
                 :key="item.id"
                 :label="item.name"
-                :value="item.id">
+                :value="item.id"
+                >
               </el-option>
             </el-select>
           </el-form-item>
@@ -426,6 +427,8 @@
           params['iSystemId'] = storage.get('sysid');
           API.delete('/ification/ificatDelete', params,{Authorization:storage.get('token')}).then((res) => {
             if (res.data.code == 200) {
+              this.currentPage = 1;
+              this.pageSize = 10;
               this.getPage();
               this.$message({
                 type: 'success',
@@ -476,6 +479,8 @@
                 type: 'success',
                 message: '删除成功!'
               });
+              this.currentPage = 1;
+              this.pageSize = 10;
               this.getPage();
             } else if(res.data.code == 1001){
               this.signOut();
