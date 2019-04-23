@@ -105,7 +105,7 @@
       <div class="content">
         <div class="cell">
           <el-form-item label="类别：">
-            <el-select v-model="editPname" placeholder="请选择" style="width: 100%" @change="editChang" :disabled="true">
+            <el-select v-model="editPname" placeholder="请选择" style="width: 100%" @change="editChang" disabled="disabled">
               <el-option
                 v-for="item in option"
                 :key="item.id"
